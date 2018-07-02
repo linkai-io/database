@@ -36,16 +36,19 @@ CREATE TABLE am.organizations (
     address2 varchar(256),
     city varchar(256) not null,
     postal_code varchar(32) not null,
-    creation_time integer not null,
+    creation_time bigint not null,
     subscription_id integer REFERENCES am.subscription_types (subscription_id)
 );
 
+CREATE UNIQUE INDEX idx_lower_organizations_organization_name ON am.organizations (lower(organization_name));
 CREATE UNIQUE INDEX idx_lower_organizations_owner_email ON am.organizations (lower(owner_email));
 
 CREATE TABLE am.users (
     user_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
     email varchar(256) not null,
+    first_name varchar(256) not null,
+    last_name varchar(256) not null,
     UNIQUE (organization_id, email),
     role_id integer REFERENCES am.roles (role_id)
 );
@@ -68,26 +71,58 @@ CREATE TABLE am.user_group_members (
 CREATE TABLE am.scan_group (
     scan_group_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    creation_time integer not null,
+    scan_group_name varchar(256) not null,
+    creation_time bigint not null,
     created_by integer REFERENCES am.users (user_id),
-    raw_input bytea not null,
-    parsed_input bytea not null,
+    original_input bytea not null,
+    deleted boolean,
+    UNIQUE (organization_id, scan_group_name)
+);
+
+CREATE TABLE am.scan_group_versions (
+    scan_group_version_id serial not null primary key,
+    organization_id integer REFERENCES am.organizations (organization_id),
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
+    version_name varchar(128) not null,
+    creation_time bigint not null,
+    created_by integer REFERENCES am.users (user_id),
     configuration jsonb,
     config_version integer not null,
-    version_name varchar(128) not null
+    deleted boolean,
+    UNIQUE (scan_group_id, version_name)
+);
+
+CREATE TABLE am.scan_group_addresses (
+    address_id bigserial not null primary key,
+    organization_id integer REFERENCES am.organizations (organization_id),
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
+    address varchar(512) not null,
+    settings jsonb,
+    added_timestamp bigint,
+    added_by varchar(128) not null,
+    is_ignored boolean
+);
+
+CREATE TABLE am.scan_group_address_map (
+    address_map_id bigserial not null primary key,
+    organization_id integer REFERENCES am.organizations (organization_id),
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
+    hostname varchar(512),
+    ipv4 varchar(64),
+    ipv6 varchar(128)
 );
 
 CREATE TABLE am.jobs (
     job_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_id integer REFERENCES am.scan_group (scan_group_id)
+    scan_group_version_id integer REFERENCES am.scan_group_versions (scan_group_version_id)
 );
 
 CREATE TABLE am.job_events (
     event_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
     job_id bigint REFERENCES am.jobs (job_id),
-    event_time integer,
+    event_time bigint,
     event_description text,
     event_from varchar(256) 
 );
@@ -96,11 +131,15 @@ CREATE TABLE am.job_events (
 -- SQL in this section is executed when the migration is rolled back.
 DROP TABLE am.job_events;
 DROP TABLE am.jobs;
+DROP TABLE am.scan_group_address_map;
+DROP TABLE am.scan_group_addresses;
+DROP TABLE am.scan_group_versions;
 DROP TABLE am.scan_group;
 DROP TABLE am.user_group_members;
 DROP TABLE am.user_groups;
 DROP INDEX am.idx_lower_users_email;
 DROP TABLE am.users;
+DROP INDEX am.idx_lower_organizations_organization_name;
 DROP INDEX am.idx_lower_organizations_owner_email;
 DROP TABLE am.organizations;
 DROP TABLE am.roles;
