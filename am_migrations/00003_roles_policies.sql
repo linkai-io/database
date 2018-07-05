@@ -83,15 +83,15 @@ ALTER TABLE am.ladon_policy ADD COLUMN meta json;
 
 CREATE TABLE IF NOT EXISTS am.ladon_role (
 	role_id varchar(255) NOT NULL PRIMARY KEY,
-    organization_id integer REFERENCES am.organizations (organization_id)
+    organization_id integer REFERENCES am.organizations (organization_id) not null
 );
 
 CREATE TABLE IF NOT EXISTS am.ladon_role_member (
     organization_id integer REFERENCES am.organizations (organization_id),
-    member		varchar(255) NOT NULL,
+    member_id integer REFERENCES am.users (user_id) not null,
 	role_id		varchar(255) NOT NULL,
 	FOREIGN KEY (role_id) REFERENCES am.ladon_role(role_id) ON DELETE CASCADE,
-	PRIMARY KEY (member, role_id)
+	PRIMARY KEY (member_id, role_id)
 );
 
 -- +goose Down

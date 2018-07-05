@@ -10,18 +10,6 @@ INSERT INTO am.subscription_types (title) values
     ('monthly'),
     ('enterprise');
 
-CREATE TABLE am.roles (
-    role_id integer not null primary key,
-    role_name varchar(128) not null unique 
-);
-
-INSERT INTO am.roles (role_id, role_name) values 
-    (1, 'Owner'),
-    (2, 'Administrator'),
-    (3, 'Auditor'),
-    (4, 'Editor'),
-    (5, 'Reviewer');
-
 CREATE TABLE am.organizations (
     organization_id serial not null primary key,
     organization_name varchar(256) not null unique,
@@ -49,24 +37,10 @@ CREATE TABLE am.users (
     email varchar(256) not null,
     first_name varchar(256) not null,
     last_name varchar(256) not null,
-    UNIQUE (organization_id, email),
-    role_id integer REFERENCES am.roles (role_id)
+    UNIQUE (organization_id, email)
 );
 
 CREATE UNIQUE INDEX idx_lower_users_email ON am.users (lower(email));
-
-CREATE TABLE am.user_groups (
-    user_group_id serial not null primary key,
-    organization_id integer REFERENCES am.organizations (organization_id),
-    user_group_name varchar(256) not null,
-    UNIQUE (organization_id, user_group_name)
-);
-
-CREATE TABLE am.user_group_members (
-    user_group_id integer REFERENCES am.user_groups (user_group_id),
-    organization_id integer REFERENCES am.organizations (organization_id),
-    member_id integer REFERENCES am.users (user_id)
-);
 
 CREATE TABLE am.scan_group (
     scan_group_id serial not null primary key,
@@ -135,12 +109,9 @@ DROP TABLE am.scan_group_address_map;
 DROP TABLE am.scan_group_addresses;
 DROP TABLE am.scan_group_versions;
 DROP TABLE am.scan_group;
-DROP TABLE am.user_group_members;
-DROP TABLE am.user_groups;
 DROP INDEX am.idx_lower_users_email;
 DROP TABLE am.users;
 DROP INDEX am.idx_lower_organizations_organization_name;
 DROP INDEX am.idx_lower_organizations_owner_email;
 DROP TABLE am.organizations;
-DROP TABLE am.roles;
 DROP TABLE am.subscription_types;
