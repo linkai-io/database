@@ -11,16 +11,16 @@ INSERT INTO am.subscription_types (title) values
     ('enterprise');
 
 CREATE TABLE am.roles (
-    role_id serial not null primary key,
+    role_id integer not null primary key,
     role_name varchar(128) not null unique 
 );
 
-INSERT INTO am.roles (role_name) values 
-    ('Owner'),
-    ('Administrator'),
-    ('Auditor'),
-    ('Editor'),
-    ('Reviewer');
+INSERT INTO am.roles (role_id, role_name) values 
+    (1, 'Owner'),
+    (2, 'Administrator'),
+    (3, 'Auditor'),
+    (4, 'Editor'),
+    (5, 'Reviewer');
 
 CREATE TABLE am.organizations (
     organization_id serial not null primary key,
