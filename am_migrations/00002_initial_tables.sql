@@ -61,7 +61,6 @@ CREATE TABLE am.scan_group_versions (
     creation_time bigint not null,
     created_by integer REFERENCES am.users (user_id),
     configuration jsonb,
-    config_version integer not null,
     deleted boolean,
     UNIQUE (scan_group_id, version_name)
 );
