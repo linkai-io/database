@@ -83,7 +83,9 @@ ALTER TABLE am.ladon_policy ADD COLUMN meta json;
 
 CREATE TABLE IF NOT EXISTS am.ladon_role (
 	role_id varchar(255) NOT NULL PRIMARY KEY,
-    organization_id integer REFERENCES am.organizations (organization_id) not null
+    organization_id integer REFERENCES am.organizations (organization_id) not null,
+    role_name varchar(255) not null,
+    UNIQUE(organization_id, role_name)
 );
 
 CREATE TABLE IF NOT EXISTS am.ladon_role_member (

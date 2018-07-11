@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
+	_ "gopkg.linkai.io/v1/repos/database/am_migrations"
 )
 
 const (
