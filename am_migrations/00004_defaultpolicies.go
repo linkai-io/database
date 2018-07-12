@@ -53,7 +53,7 @@ func buildPolicies() map[string]ladon.Policy {
 		//actions
 		crud,
 		//resources
-		[]string{am.RNScanGroupGroups, am.RNScanGroupVersions, am.RNScanGroupAddresses},
+		[]string{am.RNScanGroupGroups, am.RNScanGroupAddresses},
 	)
 
 	policies["readScanGroupPolicy"] = createPolicy(
@@ -64,7 +64,7 @@ func buildPolicies() map[string]ladon.Policy {
 		//actions
 		[]string{"read"},
 		//resources
-		[]string{am.RNScanGroupGroups, am.RNScanGroupVersions, am.RNScanGroupAddresses},
+		[]string{am.RNScanGroupGroups, am.RNScanGroupAddresses},
 	)
 
 	policies["manageJobServicePolicy"] = createPolicy(

@@ -25,6 +25,7 @@ CREATE TABLE am.organizations (
     city varchar(256) not null,
     postal_code varchar(32) not null,
     creation_time bigint not null,
+    deleted boolean,
     subscription_id integer REFERENCES am.subscription_types (subscription_id)
 );
 
@@ -37,6 +38,7 @@ CREATE TABLE am.users (
     email varchar(256) not null,
     first_name varchar(256) not null,
     last_name varchar(256) not null,
+    deleted boolean,
     UNIQUE (organization_id, email)
 );
 
@@ -48,21 +50,20 @@ CREATE TABLE am.scan_group (
     scan_group_name varchar(256) not null,
     creation_time bigint not null,
     created_by integer REFERENCES am.users (user_id),
+    modified_time bigint not null,
+    modified_by integer REFERENCES am.users (user_id),
     original_input bytea not null,
+    configuration jsonb,
     deleted boolean,
     UNIQUE (organization_id, scan_group_name)
 );
 
-CREATE TABLE am.scan_group_versions (
-    scan_group_version_id serial not null primary key,
+CREATE TABLE am.scan_address_configuration (
+    scan_address_configuration_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
-    version_name varchar(128) not null,
-    creation_time bigint not null,
-    created_by integer REFERENCES am.users (user_id),
+    configuration_name varchar(256) not null,
     configuration jsonb,
-    deleted boolean,
-    UNIQUE (scan_group_id, version_name)
+    UNIQUE (organization_id, configuration_name)
 );
 
 CREATE TABLE am.scan_group_addresses (
@@ -70,10 +71,11 @@ CREATE TABLE am.scan_group_addresses (
     organization_id integer REFERENCES am.organizations (organization_id),
     scan_group_id integer REFERENCES am.scan_group (scan_group_id),
     address varchar(512) not null,
-    settings jsonb,
+    configuration_id integer REFERENCES am.scan_address_configuration (scan_address_configuration_id),
     added_timestamp bigint,
     added_by varchar(128) not null,
-    is_ignored boolean
+    deleted boolean,
+    ignored boolean
 );
 
 CREATE TABLE am.scan_group_address_map (
@@ -82,13 +84,14 @@ CREATE TABLE am.scan_group_address_map (
     scan_group_id integer REFERENCES am.scan_group (scan_group_id),
     hostname varchar(512),
     ipv4 varchar(64),
-    ipv6 varchar(128)
+    ipv6 varchar(128),
+    deleted boolean
 );
 
 CREATE TABLE am.jobs (
     job_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_version_id integer REFERENCES am.scan_group_versions (scan_group_version_id)
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id)
 );
 
 CREATE TABLE am.job_events (
@@ -105,8 +108,8 @@ CREATE TABLE am.job_events (
 DROP TABLE am.job_events;
 DROP TABLE am.jobs;
 DROP TABLE am.scan_group_address_map;
+DROP TABLE am.scan_address_configuration;
 DROP TABLE am.scan_group_addresses;
-DROP TABLE am.scan_group_versions;
 DROP TABLE am.scan_group;
 DROP INDEX am.idx_lower_users_email;
 DROP TABLE am.users;
