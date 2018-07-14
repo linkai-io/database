@@ -66,17 +66,35 @@ CREATE TABLE am.scan_address_configuration (
     UNIQUE (organization_id, configuration_name)
 );
 
+CREATE TABLE am.scan_address_added_by (
+    scan_address_added_id serial not null primary key,
+    added_by varchar(128) not null
+);
+
+INSERT INTO am.scan_address_added_by (added_by) values 
+    ('other'),
+    ('input_list'),
+    ('ns_queries'),
+    ('dns_brute_forcer'),
+    ('dns_axfr'),
+    ('web_crawler'),
+    ('manual'),
+    ('git_hooks');
+
 CREATE TABLE am.scan_group_addresses (
     address_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
     scan_group_id integer REFERENCES am.scan_group (scan_group_id),
     address varchar(512) not null,
-    configuration_id integer REFERENCES am.scan_address_configuration (scan_address_configuration_id),
     added_timestamp bigint,
-    added_by varchar(128) not null,
+    scan_address_added_id integer REFERENCES am.scan_address_added_by (scan_address_added_id),
     deleted boolean,
-    ignored boolean
+    ignored boolean,
+    UNIQUE(scan_group_id, address)
 );
+
+CREATE INDEX idx_scan_group_addresses_address_id ON am.scan_group_addresses (organization_id,scan_group_id,address_id);
+
 
 CREATE TABLE am.scan_group_address_map (
     address_map_id bigserial not null primary key,
@@ -108,8 +126,10 @@ CREATE TABLE am.job_events (
 DROP TABLE am.job_events;
 DROP TABLE am.jobs;
 DROP TABLE am.scan_group_address_map;
-DROP TABLE am.scan_address_configuration;
+DROP INDEX am.idx_scan_group_addresses_address_id;
 DROP TABLE am.scan_group_addresses;
+DROP TABLE am.scan_address_configuration;
+DROP TABLE am.scan_address_added_by;
 DROP TABLE am.scan_group;
 DROP INDEX am.idx_lower_users_email;
 DROP TABLE am.users;
