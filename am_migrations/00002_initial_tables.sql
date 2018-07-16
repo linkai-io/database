@@ -1,18 +1,36 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
 CREATE TABLE am.subscription_types (
-    subscription_id serial not null primary key,
+    subscription_id integer not null primary key,
     title varchar(128) not null unique
 );
 
-INSERT INTO am.subscription_types (title) values 
-    ('one time'),
-    ('monthly'),
-    ('enterprise');
+INSERT INTO am.subscription_types (subscription_id, title) values 
+    (1, 'one time'),
+    (100, 'monthly'),
+    (1000, 'enterprise');
+
+CREATE TABLE am.organization_status (
+    status_id integer not null primary key,
+    description varchar(128) not null unique
+);
+
+INSERT INTO am.organization_status (status_id, description) values 
+    -- Disabled reasons 1-99
+    (1, 'Disabled - Pending Payment'),
+    (2, 'Disabled - Closed'),
+    (3, 'Disabled - Locked'),
+    -- Not Enabled reasons 100 - 999
+    (100, 'Awaiting Activation'),
+    -- Enabled reasons 1000 - ...
+    (1000, 'Active');
 
 CREATE TABLE am.organizations (
     organization_id serial not null primary key,
     organization_name varchar(256) not null unique,
+    organization_custom_id varchar(256) not null unique,
+    user_pool_id varchar(256) not null,
+    identity_pool_id varchar(256) not null,
     owner_email varchar(256) not null,
     first_name varchar(256) not null,
     last_name varchar(256) not null,
@@ -25,6 +43,7 @@ CREATE TABLE am.organizations (
     city varchar(256) not null,
     postal_code varchar(32) not null,
     creation_time bigint not null,
+    status_id integer REFERENCES am.organization_status (status_id),
     deleted boolean,
     subscription_id integer REFERENCES am.subscription_types (subscription_id)
 );
@@ -35,6 +54,7 @@ CREATE UNIQUE INDEX idx_lower_organizations_owner_email ON am.organizations (low
 CREATE TABLE am.users (
     user_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
+    user_custom_id varchar(256) not null unique,
     email varchar(256) not null,
     first_name varchar(256) not null,
     last_name varchar(256) not null,
@@ -95,7 +115,6 @@ CREATE TABLE am.scan_group_addresses (
 
 CREATE INDEX idx_scan_group_addresses_address_id ON am.scan_group_addresses (organization_id,scan_group_id,address_id);
 
-
 CREATE TABLE am.scan_group_address_map (
     address_map_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
@@ -136,4 +155,5 @@ DROP TABLE am.users;
 DROP INDEX am.idx_lower_organizations_organization_name;
 DROP INDEX am.idx_lower_organizations_owner_email;
 DROP TABLE am.organizations;
+DROP TABLE am.organization_status;
 DROP TABLE am.subscription_types;
