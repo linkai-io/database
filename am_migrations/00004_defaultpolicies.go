@@ -45,6 +45,19 @@ func Up00004(tx *sql.Tx) error {
 func buildPolicies() map[string]ladon.Policy {
 	policies := make(map[string]ladon.Policy, 0)
 
+	policies["systemManagementPolicy"] = createSystemPolicy()
+
+	policies["manageOrganizationPolicy"] = createPolicy(
+		"Manage Customer Organization",
+		[]byte("{\"key\":\"manageOrganizationPolicy\"}"),
+		//subjects
+		[]string{am.OwnerRole},
+		//actions
+		[]string{"read", "update"},
+		//resources
+		[]string{am.RNOrganizationManage},
+	)
+
 	policies["manageScanGroupPolicy"] = createPolicy(
 		"Manage Scan Groups",
 		[]byte("{\"key\":\"manageScanGroupPolicy\"}"),
@@ -177,6 +190,25 @@ func createPolicy(description string, meta []byte, subjects, actions, resources 
 		Subjects:    subjects,
 		Actions:     actions,
 		Resources:   resources,
+		Effect:      ladon.AllowAccess,
+		Conditions:  ladon.Conditions{},
+	}
+}
+
+// For allowing system users full access to services via the RNSystem resource.
+func createSystemPolicy() ladon.Policy {
+	id, err := uuid.NewV4()
+	if err != nil {
+		panic(err) // should never happen really
+	}
+
+	return &ladon.DefaultPolicy{
+		ID:          id.String(),
+		Description: "System Management Policy",
+		Meta:        []byte("{\"key\":\"systemManagementPolicy\"}"),
+		Subjects:    []string{am.SystemRole, am.SystemSupportRole},
+		Actions:     crud,
+		Resources:   []string{am.RNSystem},
 		Effect:      ladon.AllowAccess,
 		Conditions:  ladon.Conditions{},
 	}

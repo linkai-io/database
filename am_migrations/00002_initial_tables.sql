@@ -1,25 +1,28 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
+CREATE DOMAIN required_text as varchar(256) not null check (length(value) > 0);
+
 CREATE TABLE am.subscription_types (
     subscription_id integer not null primary key,
     title varchar(128) not null unique
 );
 
 INSERT INTO am.subscription_types (subscription_id, title) values 
-    (1, 'one time'),
+    (0, 'pending'),
+    (10, 'one time'),
     (100, 'monthly'),
     (1000, 'enterprise');
 
 CREATE TABLE am.organization_status (
     status_id integer not null primary key,
-    description varchar(128) not null unique
+    description required_text unique
 );
 
 INSERT INTO am.organization_status (status_id, description) values 
-    -- Disabled reasons 1-99
-    (1, 'Disabled - Pending Payment'),
-    (2, 'Disabled - Closed'),
-    (3, 'Disabled - Locked'),
+    -- Disabled reasons 0-99
+    (0, 'Disabled - Pending Payment'),
+    (1, 'Disabled - Closed'),
+    (2, 'Disabled - Locked'),
     -- Not Enabled reasons 100 - 999
     (100, 'Awaiting Activation'),
     -- Enabled reasons 1000 - ...
@@ -27,21 +30,21 @@ INSERT INTO am.organization_status (status_id, description) values
 
 CREATE TABLE am.organizations (
     organization_id serial not null primary key,
-    organization_name varchar(256) not null unique,
-    organization_custom_id varchar(256) not null unique,
-    user_pool_id varchar(256) not null,
-    identity_pool_id varchar(256) not null,
-    owner_email varchar(256) not null,
-    first_name varchar(256) not null,
-    last_name varchar(256) not null,
-    phone varchar(32) not null,
-    country varchar(128) not null,
-    state_prefecture varchar(256) not null,
-    street varchar(256) not null, 
-    address1 varchar(256),
-    address2 varchar(256),
-    city varchar(256) not null,
-    postal_code varchar(32) not null,
+    organization_name required_text unique,
+    organization_custom_id required_text unique,
+    user_pool_id required_text,
+    identity_pool_id required_text,
+    owner_email required_text,
+    first_name required_text,
+    last_name required_text,
+    phone required_text,
+    country required_text,
+    state_prefecture required_text,
+    street required_text, 
+    address1 varchar(256) not null,
+    address2 varchar(256) not null,
+    city required_text,
+    postal_code required_text,
     creation_time bigint not null,
     status_id integer REFERENCES am.organization_status (status_id),
     deleted boolean,
@@ -54,10 +57,10 @@ CREATE UNIQUE INDEX idx_lower_organizations_owner_email ON am.organizations (low
 CREATE TABLE am.users (
     user_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    user_custom_id varchar(256) not null unique,
-    email varchar(256) not null,
-    first_name varchar(256) not null,
-    last_name varchar(256) not null,
+    user_custom_id required_text unique,
+    email required_text,
+    first_name required_text,
+    last_name required_text,
     deleted boolean,
     UNIQUE (organization_id, email)
 );
@@ -67,7 +70,7 @@ CREATE UNIQUE INDEX idx_lower_users_email ON am.users (lower(email));
 CREATE TABLE am.scan_group (
     scan_group_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_name varchar(256) not null,
+    scan_group_name required_text,
     creation_time bigint not null,
     created_by integer REFERENCES am.users (user_id),
     modified_time bigint not null,
@@ -81,14 +84,14 @@ CREATE TABLE am.scan_group (
 CREATE TABLE am.scan_address_configuration (
     scan_address_configuration_id serial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    configuration_name varchar(256) not null,
+    configuration_name required_text,
     configuration jsonb,
     UNIQUE (organization_id, configuration_name)
 );
 
 CREATE TABLE am.scan_address_added_by (
     scan_address_added_id serial not null primary key,
-    added_by varchar(128) not null
+    added_by required_text
 );
 
 INSERT INTO am.scan_address_added_by (added_by) values 
@@ -157,3 +160,4 @@ DROP INDEX am.idx_lower_organizations_owner_email;
 DROP TABLE am.organizations;
 DROP TABLE am.organization_status;
 DROP TABLE am.subscription_types;
+DROP DOMAIN required_text;
