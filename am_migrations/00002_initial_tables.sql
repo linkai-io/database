@@ -47,7 +47,7 @@ CREATE TABLE am.organizations (
     postal_code required_text,
     creation_time bigint not null,
     status_id integer REFERENCES am.organization_status (status_id),
-    deleted boolean,
+    deleted boolean not null,
     subscription_id integer REFERENCES am.subscription_types (subscription_id)
 );
 
@@ -61,7 +61,7 @@ CREATE TABLE am.users (
     email required_text,
     first_name required_text,
     last_name required_text,
-    deleted boolean,
+    deleted boolean not null,
     UNIQUE (organization_id, email)
 );
 
@@ -77,7 +77,7 @@ CREATE TABLE am.scan_group (
     modified_by integer REFERENCES am.users (user_id),
     original_input bytea not null,
     configuration jsonb,
-    deleted boolean,
+    deleted boolean not null,
     UNIQUE (organization_id, scan_group_name)
 );
 
@@ -111,8 +111,8 @@ CREATE TABLE am.scan_group_addresses (
     address varchar(512) not null,
     added_timestamp bigint,
     scan_address_added_id integer REFERENCES am.scan_address_added_by (scan_address_added_id),
-    deleted boolean,
-    ignored boolean,
+    deleted boolean not null,
+    ignored boolean not null,
     UNIQUE(scan_group_id, address)
 );
 
@@ -125,7 +125,7 @@ CREATE TABLE am.scan_group_address_map (
     hostname varchar(512),
     ipv4 varchar(64),
     ipv6 varchar(128),
-    deleted boolean
+    deleted boolean not null
 );
 
 CREATE TABLE am.jobs (
@@ -140,7 +140,7 @@ CREATE TABLE am.job_events (
     job_id bigint REFERENCES am.jobs (job_id),
     event_time bigint,
     event_description text,
-    event_from varchar(256) 
+    event_from required_text
 );
 
 -- +goose Down
