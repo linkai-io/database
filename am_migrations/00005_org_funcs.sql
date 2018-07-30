@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE FUNCTION am.create_org(orgname varchar(256)) RETURNS void AS 
+CREATE FUNCTION am.create_test_org(orgname varchar(256)) RETURNS void AS 
 $BODY$
 BEGIN
     with org as (
@@ -26,6 +26,8 @@ $BODY$ LANGUAGE plpgsql;
 CREATE FUNCTION am.delete_org(org_id integer) RETURNS void as 
 $BODY$
 BEGIN 
+    delete from am.ladon_role_member where organization_id=org_id;
+    delete from am.ladon_role where organization_id=org_id;
     delete from am.users where organization_id=org_id; 
     delete from am.organizations where organization_id=org_id;
 
@@ -36,4 +38,4 @@ $BODY$ LANGUAGE plpgsql;
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
 DROP FUNCTION am.delete_org(org_id integer);
-DROP FUNCTION am.create_org(orgname varchar(256));
+DROP FUNCTION am.create_test_org(orgname varchar(256));

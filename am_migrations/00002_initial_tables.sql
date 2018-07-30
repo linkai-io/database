@@ -11,7 +11,8 @@ INSERT INTO am.subscription_types (subscription_id, title) values
     (1, 'pending'),
     (10, 'one time'),
     (100, 'monthly'),
-    (1000, 'enterprise');
+    (1000, 'enterprise'),
+    (9999, 'system');
 
 CREATE TABLE am.organization_status (
     status_id integer not null primary key,
