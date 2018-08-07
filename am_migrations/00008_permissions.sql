@@ -1,7 +1,9 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
-revoke all on SCHEMA am FROM PUBLIC;
+revoke all on schema am from public;
 revoke all on schema public from public;
+revoke all on all functions in schema public from public;
+revoke all on all functions in schema am from public;
 
 -- allow all services to access the roles/perm/policy tables.
 -- allows usage on am schema, but disable creating tables.

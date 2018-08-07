@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
+	uuid "github.com/gofrs/uuid"
 	"github.com/jackc/pgx"
 	"github.com/ory/ladon"
 	"github.com/pressly/goose"
-	uuid "github.com/satori/go.uuid"
 	"gopkg.linkai.io/v1/repos/am/am"
 	"gopkg.linkai.io/v1/repos/am/pkg/auth/ladonauth"
 )

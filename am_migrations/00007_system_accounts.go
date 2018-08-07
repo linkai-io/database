@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	uuid "github.com/gofrs/uuid"
 	"github.com/pressly/goose"
-	uuid "github.com/satori/go.uuid"
 	"gopkg.linkai.io/v1/repos/am/am"
 )
 
