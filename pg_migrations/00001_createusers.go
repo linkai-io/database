@@ -5,39 +5,35 @@ import (
 	"errors"
 	"os"
 
+	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
+
 	"github.com/pressly/goose"
 )
 
-var users map[string]string
-
-var (
-	secret00001_admin = os.Getenv("GOOSE_SECRET_00001_admin")
-)
+var users = []string{"jobservice", "orgservice", "userservice", "tagservice", "scangroupservice", "addressservice", "findingsservice"}
 
 func init() {
 	goose.AddMigration(Up00001, Down00001)
-	users = make(map[string]string, 0)
-	users["jobservice"] = os.Getenv("GOOSE_SECRET_00001_jobservice")
-	users["inputservice"] = os.Getenv("GOOSE_SECRET_00001_inputservice")
-	users["orgservice"] = os.Getenv("GOOSE_SECRET_00001_orgservice")
-	users["userservice"] = os.Getenv("GOOSE_SECRET_00001_userservice")
-	users["tagservice"] = os.Getenv("GOOSE_SECRET_00001_tagservice")
-	users["scangroupservice"] = os.Getenv("GOOSE_SECRET_00001_scangroupservice")
-	users["hostservice"] = os.Getenv("GOOSE_SECRET_00001_hostservice")
 }
 
 func Up00001(tx *sql.Tx) error {
-
-	if secret00001_admin == "" {
-		return errors.New("GOOSE_SECRET_00001_admin not set")
+	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
+	adminPassword, err := dbsecrets.ServicePassword("linkai_admin")
+	userMap, err := getServicePasswords(dbsecrets, users)
+	if err != nil {
+		return err
 	}
 
-	if _, err := tx.Exec("CREATE USER linkai_admin WITH LOGIN SUPERUSER INHERIT ENCRYPTED PASSWORD '" + secret00001_admin + "'"); err != nil {
+	if adminPassword == "" {
+		return errors.New("linkai_admin not set")
+	}
+
+	if _, err := tx.Exec("CREATE USER linkai_admin WITH LOGIN SUPERUSER INHERIT ENCRYPTED PASSWORD '" + adminPassword + "'"); err != nil {
 		return err
 	}
 
 	// ugh, unavoidable, CREATE USER can not be executed with a prepared statement.
-	for service, passwd := range users {
+	for service, passwd := range userMap {
 		if _, err := tx.Exec("CREATE USER " + service + " WITH LOGIN NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION ENCRYPTED PASSWORD '" + passwd + "'"); err != nil {
 			return err
 		}
@@ -46,9 +42,24 @@ func Up00001(tx *sql.Tx) error {
 	return nil
 }
 
+func getServicePasswords(dbsecrets *secrets.DBSecrets, users []string) (map[string]string, error) {
+	userMap := make(map[string]string, 0)
+	for _, user := range users {
+		password, err := dbsecrets.ServicePassword(user)
+		if password == "" {
+			return nil, errors.New("empty password for user: " + user)
+		}
+		userMap[user] = password
+		if err != nil {
+			return nil, err
+		}
+	}
+	return userMap, nil
+}
+
 func Down00001(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
-	for service := range users {
+	for _, service := range users {
 		if _, err := tx.Exec("DROP USER " + service); err != nil {
 			return err
 		}

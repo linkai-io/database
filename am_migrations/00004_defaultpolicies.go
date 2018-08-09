@@ -12,11 +12,11 @@ import (
 	"github.com/pressly/goose"
 	"gopkg.linkai.io/v1/repos/am/am"
 	"gopkg.linkai.io/v1/repos/am/pkg/auth/ladonauth"
+	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
 )
 
 var (
-	secret_admin = os.Getenv("GOOSE_AM_DB_STRING")
-	crud         = []string{"create", "read", "update", "delete"}
+	crud = []string{"create", "read", "update", "delete"}
 )
 
 func init() {
@@ -24,9 +24,6 @@ func init() {
 }
 
 func Up00004(tx *sql.Tx) error {
-	if secret_admin == "" {
-		return errors.New("db string not set")
-	}
 	m, err := initPolicyManager()
 	if err != nil {
 		return err
@@ -34,10 +31,9 @@ func Up00004(tx *sql.Tx) error {
 	policies := buildPolicies()
 	for name, policy := range policies {
 		if err := m.Create(policy); err != nil {
-			return errors.New(fmt.Sprintf("%s policy failed creation: %s\n", name, err))
+			return fmt.Errorf("%s policy failed creation: %s\n", name, err)
 		}
 	}
-
 	// This code is executed when the migration is applied.
 	return nil
 }
@@ -66,7 +62,7 @@ func buildPolicies() map[string]ladon.Policy {
 		//actions
 		crud,
 		//resources
-		[]string{am.RNScanGroupGroups, am.RNScanGroupAddresses},
+		[]string{am.RNScanGroupGroups},
 	)
 
 	policies["readScanGroupPolicy"] = createPolicy(
@@ -77,7 +73,51 @@ func buildPolicies() map[string]ladon.Policy {
 		//actions
 		[]string{"read"},
 		//resources
-		[]string{am.RNScanGroupGroups, am.RNScanGroupAddresses},
+		[]string{am.RNScanGroupGroups},
+	)
+
+	policies["manageAddressesPolicy"] = createPolicy(
+		"Manage Addresses",
+		[]byte("{\"key\":\"manageAddressesPolicy\"}"),
+		//subjects
+		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
+		//actions
+		crud,
+		//resources
+		[]string{am.RNAddressAddresses},
+	)
+
+	policies["readAddressesPolicy"] = createPolicy(
+		"Read Only Addresses",
+		[]byte("{\"key\":\"readAddressesPolicy\"}"),
+		//subjects
+		[]string{am.EditorRole, am.ReviewerRole},
+		//actions
+		[]string{"read"},
+		//resources
+		[]string{am.RNAddressAddresses},
+	)
+
+	policies["manageFindingsPolicy"] = createPolicy(
+		"Manage Findings",
+		[]byte("{\"key\":\"manageFindingsPolicy\"}"),
+		//subjects
+		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
+		//actions
+		crud,
+		//resources
+		[]string{am.RNFindingsFindings},
+	)
+
+	policies["readFindingsPolicy"] = createPolicy(
+		"Read Only Findings",
+		[]byte("{\"key\":\"readFindingsPolicy\"}"),
+		//subjects
+		[]string{am.EditorRole, am.ReviewerRole},
+		//actions
+		[]string{"read"},
+		//resources
+		[]string{am.RNFindingsFindings},
 	)
 
 	policies["manageJobServicePolicy"] = createPolicy(
@@ -143,9 +183,7 @@ func buildPolicies() map[string]ladon.Policy {
 // and then delete those ids that match.
 func Down00004(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
-	if secret_admin == "" {
-		return errors.New("db string not set")
-	}
+
 	m, err := initPolicyManager()
 	if err != nil {
 		return err
@@ -215,7 +253,17 @@ func createSystemPolicy() ladon.Policy {
 }
 
 func initPolicyManager() (*ladonauth.LadonPolicyManager, error) {
-	conf, err := pgx.ParseConnectionString(secret_admin)
+	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
+	dbstring, err := dbsecrets.DBString("linkai_admin")
+	if err != nil {
+		return nil, err
+	}
+
+	if dbstring == "" {
+		return nil, errors.New("db string not set")
+	}
+
+	conf, err := pgx.ParseConnectionString(dbstring)
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,8 @@ import (
 	"flag"
 	"log"
 	"os"
-	"strings"
+
+	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
 
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
@@ -17,12 +18,13 @@ const (
 )
 
 var (
-	flags = flag.NewFlagSet("goose", flag.ExitOnError)
-	dir   = flags.String("dir", ".", "directory with migration files")
+	env    = os.Getenv("APP_ENV")
+	region = os.Getenv("APP_REGION")
+	flags  = flag.NewFlagSet("goose", flag.ExitOnError)
+	dir    = flags.String("dir", ".", "directory with migration files")
 )
 
 func main() {
-	var dbstring string
 	flags.Usage = usage
 	flags.Parse(os.Args[1:])
 
@@ -39,7 +41,6 @@ func main() {
 		return
 	}
 
-	log.Printf("%#v\n", args)
 	if args[0] == "-h" || args[0] == "--help" {
 		flags.Usage()
 		return
@@ -51,17 +52,15 @@ func main() {
 		log.Fatalf("unable to set postgres dialect: %s\n", err)
 	}
 
-	if strings.Contains(*dir, "pg_") {
-		dbstring = os.Getenv("GOOSE_PG_DB_STRING")
-	}
-
-	if dbstring == "" {
-		log.Fatalf("-dbstring=%q not supported\n", dbstring)
+	dbsecrets := secrets.NewDBSecrets(env, region)
+	dbstring, err := dbsecrets.DBString("postgres")
+	if err != nil {
+		log.Fatalf("error getting database string: %s\n", err)
 	}
 
 	db, err := sql.Open(driver, dbstring)
 	if err != nil {
-		log.Fatalf("-dbstring=%q: %v\n", dbstring, err)
+		log.Fatalf("error opening db connection: %s\n", err)
 	}
 
 	arguments := []string{}
@@ -70,7 +69,7 @@ func main() {
 	}
 
 	if err := goose.Run(command, db, *dir, arguments...); err != nil {
-		log.Fatalf("goose run: %v", err)
+		log.Fatalf("pgm run: %v", err)
 	}
 }
 
@@ -81,16 +80,14 @@ func usage() {
 }
 
 var (
-	usagePrefix = `Usage: goose [OPTIONS] COMMAND
+	usagePrefix = `Usage: pgm [OPTIONS] COMMAND
 Examples:
-	(export GOOSE_AM_DB_STRING="user=linkai_admin dbname=linkai password=??? sslmode=disable")
-	(export GOOSE_PG_DB_STRING="user=postgres dbname=postgres password=??? sslmode=disable")
-	goose -dir ./am_migrations status
-	goose -dir ./am_migrations create init sql
-	goose -dir ./am_migrations create something_from_go_file go
-	goose -dir ./am_migrations up
-	goose -dir ./am_migrations down
-	goose -dir ./am_migrations redo
+	pgm -dir ./am_migrations status
+	pgm -dir ./am_migrations create init sql
+	pgm -dir ./am_migrations create something_from_go_file go
+	pgm -dir ./am_migrations up
+	pgm -dir ./am_migrations down
+	pgm -dir ./am_migrations redo
 Options:
 `
 

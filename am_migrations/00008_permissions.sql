@@ -27,6 +27,7 @@ grant select on am.ladon_policy_resource_rel to linkai_user;
 -- jobservice permissions
 grant linkai_user to jobservice;
 revoke all on schema am from jobservice;
+grant select, insert, update, delete on am.job_status to jobservice;
 grant select, insert, update, delete on am.jobs to jobservice; 
 grant select, insert, update, delete on am.job_events to jobservice;
 grant references (organization_id) on table am.organizations to jobservice;
@@ -40,6 +41,7 @@ grant select, insert, update, delete on am.organizations to orgservice;
 grant select, insert, update, delete on am.users to orgservice; 
 grant select, insert, update, delete on am.ladon_role to orgservice; 
 grant select, insert, update, delete on am.ladon_role_member to orgservice; 
+grant execute on function am.delete_org to orgservice;
 grant select on am.organization_status to orgservice;
 grant select on am.subscription_types to orgservice;
 
@@ -53,44 +55,78 @@ grant references (organization_id) on table am.organizations to userservice;
 -- scangroupservice permissions
 grant linkai_user to scangroupservice;
 grant select, insert, update, delete on am.scan_group to scangroupservice;
-grant select, insert, update, delete on am.scan_address_configuration to scangroupservice;
-grant select, insert, update, delete on am.scan_group_addresses to scangroupservice;
-grant select, insert, update, delete on am.scan_group_address_map to scangroupservice;
-grant select on am.scan_address_added_by to scangroupservice;
 grant references (organization_id) on table am.organizations to scangroupservice;
 grant references (user_id) on table am.users to scangroupservice;
 
+-- addressservice permissions
+grant linkai_user to addressservice;
+grant select, insert, update, delete on am.scan_group_addresses to addressservice;
+grant select on am.scan_address_discovered_by to addressservice;
+grant references (organization_id) on table am.organizations to addressservice;
+grant references (user_id) on table am.users to addressservice;
+grant references (scan_group_id) on table am.scan_group to addressservice;
+
+-- findingsservice permissions
+grant linkai_user to findingsservice;
+grant select, insert, update, delete on am.scan_group_findings to findingsservice;
+grant select on am.scan_finding_types to findingsservice;
+grant references (organization_id) on table am.organizations to findingsservice;
+grant references (user_id) on table am.users to findingsservice;
+grant references (scan_group_id) on table am.scan_group to findingsservice;
+grant references (job_id) on table am.jobs to findingsservice;
+
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
+
+-- findingsservice permissions
+revoke linkai_user from findingsservice;
+revoke select, insert, update, delete on am.scan_group_findings from findingsservice;
+revoke select on am.scan_finding_types from findingsservice;
+revoke references (organization_id) on table am.organizations from findingsservice;
+revoke references (user_id) on table am.users from findingsservice;
+revoke references (scan_group_id) on table am.scan_group from findingsservice;
+revoke references (job_id) on table am.jobs from findingsservice;
+
+-- addressservice permissions
+revoke linkai_user from addressservice;
+revoke select, insert, update, delete on am.scan_group_addresses from addressservice;
+revoke select on am.scan_address_discovered_by from addressservice;
+revoke references (organization_id) on table am.organizations from addressservice;
+revoke references (user_id) on table am.users from addressservice;
+revoke references (scan_group_id) on table am.scan_group from addressservice;
+
+-- scangroupservice permissions
 revoke linkai_user from scangroupservice;
 revoke select, insert, update, delete on am.scan_group from scangroupservice;
-revoke select, insert, update, delete on am.scan_address_configuration from scangroupservice;
-revoke select, insert, update, delete on am.scan_group_addresses from scangroupservice;
-revoke select, insert, update, delete on am.scan_group_address_map from scangroupservice;
-revoke select on am.scan_address_added_by from scangroupservice;
 revoke references (organization_id) on table am.organizations from scangroupservice;
 revoke references (user_id) on table am.users from scangroupservice;
 
+-- userservice permissions
 revoke linkai_user from userservice;
 revoke select, insert, update, delete on am.users from userservice;
 revoke select on am.user_status from userservice;
 revoke references (organization_id) on table am.organizations from userservice;
 
+-- orgservice permissions
 revoke linkai_user from orgservice;
 revoke select, insert, update, delete on am.organizations from orgservice; 
 revoke select, insert, update, delete on am.users from orgservice; 
 revoke select, insert, update, delete on am.ladon_role from orgservice; 
 revoke select, insert, update, delete on am.ladon_role_member from orgservice; 
+revoke execute on function am.delete_org from orgservice;
 revoke select on am.organization_status from orgservice;
 revoke select on am.subscription_types from orgservice;
 
+-- jobservice permissions
 revoke linkai_user from jobservice;
+revoke select, insert, update, delete on am.job_status from jobservice;
 revoke select, insert, update, delete on am.jobs from jobservice; 
 revoke select, insert, update, delete on am.job_events from jobservice;
 revoke references (organization_id) on table am.organizations from jobservice;
 revoke references (user_id) on table am.users from jobservice;
 revoke references (scan_group_id) on table am.scan_group from jobservice;
 
+-- linkai_user role
 revoke select on am.ladon_role from linkai_user;
 revoke select on am.ladon_role_member from linkai_user;
 revoke select on am.ladon_policy from linkai_user;

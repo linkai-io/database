@@ -97,57 +97,46 @@ CREATE TABLE am.scan_group (
     UNIQUE (organization_id, scan_group_name)
 );
 
-CREATE TABLE am.scan_address_configuration (
-    scan_address_configuration_id serial not null primary key,
-    organization_id integer REFERENCES am.organizations (organization_id),
-    configuration_name required_text,
-    configuration jsonb,
-    UNIQUE (organization_id, configuration_name)
+CREATE TABLE am.scan_address_discovered_by (
+    discovery_id integer not null primary key,
+    discovered_by required_text
 );
 
-CREATE TABLE am.scan_address_added_by (
-    scan_address_added_id serial not null primary key,
-    added_by required_text
+INSERT INTO am.scan_address_discovered_by (discovery_id, discovered_by) values 
+    -- manual addition of addresses
+    (1, 'input_list'),
+    (2, 'manual'),
+    (3, 'other'),
+    -- ns analyzer module 100-200
+    (100, 'ns_query_other'),
+    (101, 'ns_query_ip_to_name'),
+    (102, 'ns_query_name_to_ip'),
+    -- dns brute module 200-300
+    (200, 'dns_brute_forcer'),
+    (201, 'dns_axfr'),
+    -- web modules 300 - 999
+    (300, 'web_crawler'),
+    -- other, feature modules
+    (1000, 'git_hooks');
+
+CREATE TABLE am.job_status (
+    status_id integer not null primary key,
+    status required_text
 );
 
-INSERT INTO am.scan_address_added_by (added_by) values 
-    ('other'),
-    ('input_list'),
-    ('ns_queries'),
-    ('dns_brute_forcer'),
-    ('dns_axfr'),
-    ('web_crawler'),
-    ('manual'),
-    ('git_hooks');
+INSERT INTO am.job_status (status_id, status) values 
+    (1, 'started'),
+    (2, 'paused'),
+    (3, 'canceled'),
+    (4, 'finished');
 
-CREATE TABLE am.scan_group_addresses (
-    address_id bigserial not null primary key,
-    organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
-    address varchar(512) not null,
-    added_timestamp bigint,
-    scan_address_added_id integer REFERENCES am.scan_address_added_by (scan_address_added_id),
-    deleted boolean not null,
-    ignored boolean not null,
-    UNIQUE(scan_group_id, address)
-);
-
-CREATE INDEX idx_scan_group_addresses_address_id ON am.scan_group_addresses (organization_id,scan_group_id,address_id);
-
-CREATE TABLE am.scan_group_address_map (
-    address_map_id bigserial not null primary key,
-    organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
-    hostname varchar(512),
-    ipv4 varchar(64),
-    ipv6 varchar(128),
-    deleted boolean not null
-);
 
 CREATE TABLE am.jobs (
     job_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_id integer REFERENCES am.scan_group (scan_group_id)
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
+    job_timestamp bigint,
+    job_status integer REFERENCES am.job_status (status_id)
 );
 
 CREATE TABLE am.job_events (
@@ -159,15 +148,56 @@ CREATE TABLE am.job_events (
     event_from required_text
 );
 
+CREATE TABLE am.scan_group_addresses (
+    address_id bigserial not null primary key,
+    organization_id integer REFERENCES am.organizations (organization_id),
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
+    host_address varchar(512),
+    ip_address varchar(256),
+    discovered_timestamp bigint,
+    discovery_id integer REFERENCES am.scan_address_discovered_by (discovery_id),
+    last_job_id bigint REFERENCES am.jobs (job_id),
+    last_seen_timestamp bigint,
+    is_soa boolean not null,
+    is_wildcard_zone boolean not null,
+    is_hosted_service boolean not null,
+    ignored boolean not null,
+    check (host_address is not null or ip_address is not null),
+    UNIQUE(scan_group_id, host_address, ip_address)
+);
+
+CREATE INDEX idx_scan_group_addresses_address_id ON am.scan_group_addresses (organization_id,scan_group_id,address_id);
+
+CREATE TABLE am.scan_finding_types (
+    finding_id integer not null primary key,
+    description required_text
+);
+
+INSERT INTO am.scan_finding_types (finding_id, description) values 
+    (1, 'all_ns_records'),
+    (2, 'axfr_results'),
+    (3, 'other');
+
+CREATE TABLE am.scan_group_findings (
+    organization_id integer REFERENCES am.organizations (organization_id),
+    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
+    address_id integer REFERENCES am.scan_group_addresses (address_id) on delete cascade,
+    finding_id integer REFERENCES am.scan_finding_types (finding_id),
+    job_id integer REFERENCES am.jobs (job_id),
+    custom_description text,
+    data jsonb
+);
+
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
-DROP TABLE am.job_events;
-DROP TABLE am.jobs;
-DROP TABLE am.scan_group_address_map;
+DROP TABLE am.scan_group_findings;
+DROP TABLE am.scan_finding_types;
 DROP INDEX am.idx_scan_group_addresses_address_id;
 DROP TABLE am.scan_group_addresses;
-DROP TABLE am.scan_address_configuration;
-DROP TABLE am.scan_address_added_by;
+DROP TABLE am.job_events;
+DROP TABLE am.jobs;
+DROP TABLE am.job_status;
+DROP TABLE am.scan_address_discovered_by;
 DROP TABLE am.scan_group;
 DROP INDEX am.idx_lower_users_email;
 DROP TABLE am.users;
