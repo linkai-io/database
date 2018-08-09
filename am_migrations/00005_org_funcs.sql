@@ -37,7 +37,7 @@ BEGIN
     delete from am.organizations where organization_id=org_id;
 
 END
-$BODY$ LANGUAGE plpgsql;
+$BODY$ LANGUAGE plpgsql SECURITY DEFINER;
 -- +goose StatementEnd
 
 -- +goose Down
