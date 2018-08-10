@@ -143,6 +143,7 @@ CREATE TABLE am.job_events (
     event_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
     job_id bigint REFERENCES am.jobs (job_id),
+    event_user_id integer references am.users (user_id), 
     event_time bigint,
     event_description text,
     event_from required_text
