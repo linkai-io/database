@@ -94,6 +94,7 @@ CREATE TABLE am.scan_group (
     original_input bytea not null,
     configuration jsonb,
     deleted boolean not null,
+    paused boolean not null,
     UNIQUE (organization_id, scan_group_name)
 );
 
