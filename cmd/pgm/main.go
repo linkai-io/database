@@ -6,11 +6,11 @@ import (
 	"log"
 	"os"
 
-	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
+	"github.com/linkai-io/am/pkg/secrets"
 
 	_ "github.com/lib/pq"
+	_ "github.com/linkai-io/database/pg_migrations"
 	"github.com/pressly/goose"
-	_ "gopkg.linkai.io/v1/repos/database/pg_migrations"
 )
 
 const (

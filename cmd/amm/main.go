@@ -7,9 +7,9 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	"github.com/linkai-io/am/pkg/secrets"
+	_ "github.com/linkai-io/database/am_migrations"
 	"github.com/pressly/goose"
-	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
-	_ "gopkg.linkai.io/v1/repos/database/am_migrations"
 )
 
 const (

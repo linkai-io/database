@@ -5,7 +5,7 @@ import (
 	"errors"
 	"os"
 
-	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
+	"github.com/linkai-io/am/pkg/secrets"
 
 	"github.com/pressly/goose"
 )

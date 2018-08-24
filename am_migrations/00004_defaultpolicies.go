@@ -8,11 +8,11 @@ import (
 
 	uuid "github.com/gofrs/uuid"
 	"github.com/jackc/pgx"
+	"github.com/linkai-io/am/am"
+	"github.com/linkai-io/am/pkg/auth/ladonauth"
+	"github.com/linkai-io/am/pkg/secrets"
 	"github.com/ory/ladon"
 	"github.com/pressly/goose"
-	"gopkg.linkai.io/v1/repos/am/am"
-	"gopkg.linkai.io/v1/repos/am/pkg/auth/ladonauth"
-	"gopkg.linkai.io/v1/repos/am/pkg/secrets"
 )
 
 var (

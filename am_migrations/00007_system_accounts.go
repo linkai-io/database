@@ -5,8 +5,8 @@ import (
 	"time"
 
 	uuid "github.com/gofrs/uuid"
+	"github.com/linkai-io/am/am"
 	"github.com/pressly/goose"
-	"gopkg.linkai.io/v1/repos/am/am"
 )
 
 const (
