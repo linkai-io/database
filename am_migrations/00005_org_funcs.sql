@@ -30,8 +30,7 @@ BEGIN
     delete from am.ladon_role where organization_id=org_id;
     delete from am.scan_group_findings where organization_id=org_id;
     delete from am.scan_group_addresses where organization_id=org_id;
-    delete from am.job_events where organization_id=org_id;
-    delete from am.jobs where organization_id=org_id;
+    delete from am.scan_group_events where organization_id=org_id;
     delete from am.scan_group where organization_id=org_id;
     delete from am.users where organization_id=org_id; 
     delete from am.organizations where organization_id=org_id;

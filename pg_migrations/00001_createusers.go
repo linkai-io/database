@@ -10,7 +10,7 @@ import (
 	"github.com/pressly/goose"
 )
 
-var users = []string{"jobservice", "orgservice", "userservice", "tagservice", "scangroupservice", "addressservice", "findingsservice"}
+var users = []string{"eventservice", "orgservice", "userservice", "tagservice", "scangroupservice", "addressservice", "findingsservice"}
 
 func init() {
 	goose.AddMigration(Up00001, Down00001)

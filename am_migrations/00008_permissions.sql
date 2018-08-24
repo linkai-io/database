@@ -24,15 +24,13 @@ grant select on am.ladon_policy_action_rel to linkai_user;
 grant select on am.ladon_policy_resource_rel to linkai_user;
 
 
--- jobservice permissions
-grant linkai_user to jobservice;
-revoke all on schema am from jobservice;
-grant select, insert, update, delete on am.job_status to jobservice;
-grant select, insert, update, delete on am.jobs to jobservice; 
-grant select, insert, update, delete on am.job_events to jobservice;
-grant references (organization_id) on table am.organizations to jobservice;
-grant references (user_id) on table am.users to jobservice;
-grant references (scan_group_id) on table am.scan_group to jobservice;
+-- eventservice permissions
+grant linkai_user to eventservice;
+revoke all on schema am from eventservice;
+grant select, insert, update, delete on am.scan_group_events to eventservice;
+grant references (organization_id) on table am.organizations to eventservice;
+grant references (user_id) on table am.users to eventservice;
+grant references (scan_group_id) on table am.scan_group to eventservice;
 
 
 -- orgservice permissions
@@ -50,7 +48,6 @@ grant linkai_user to userservice;
 grant select, insert, update, delete on am.users to userservice;
 grant select on am.user_status to userservice;
 grant references (organization_id) on table am.organizations to userservice;
-
 
 -- scangroupservice permissions
 grant linkai_user to scangroupservice;
@@ -73,7 +70,6 @@ grant select on am.scan_finding_types to findingsservice;
 grant references (organization_id) on table am.organizations to findingsservice;
 grant references (user_id) on table am.users to findingsservice;
 grant references (scan_group_id) on table am.scan_group to findingsservice;
-grant references (job_id) on table am.jobs to findingsservice;
 
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
@@ -85,7 +81,6 @@ revoke select on am.scan_finding_types from findingsservice;
 revoke references (organization_id) on table am.organizations from findingsservice;
 revoke references (user_id) on table am.users from findingsservice;
 revoke references (scan_group_id) on table am.scan_group from findingsservice;
-revoke references (job_id) on table am.jobs from findingsservice;
 
 -- addressservice permissions
 revoke linkai_user from addressservice;
@@ -117,14 +112,12 @@ revoke execute on function am.delete_org from orgservice;
 revoke select on am.organization_status from orgservice;
 revoke select on am.subscription_types from orgservice;
 
--- jobservice permissions
-revoke linkai_user from jobservice;
-revoke select, insert, update, delete on am.job_status from jobservice;
-revoke select, insert, update, delete on am.jobs from jobservice; 
-revoke select, insert, update, delete on am.job_events from jobservice;
-revoke references (organization_id) on table am.organizations from jobservice;
-revoke references (user_id) on table am.users from jobservice;
-revoke references (scan_group_id) on table am.scan_group from jobservice;
+-- eventservice permissions
+revoke linkai_user from eventservice;
+revoke select, insert, update, delete on am.scan_group_events from eventservice;
+revoke references (organization_id) on table am.organizations from eventservice;
+revoke references (user_id) on table am.users from eventservice;
+revoke references (scan_group_id) on table am.scan_group from eventservice;
 
 -- linkai_user role
 revoke select on am.ladon_role from linkai_user;

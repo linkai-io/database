@@ -91,7 +91,7 @@ CREATE TABLE am.scan_group (
     created_by integer REFERENCES am.users (user_id),
     modified_time bigint not null,
     modified_by integer REFERENCES am.users (user_id),
-    original_input bytea not null,
+    original_input_s3_url required_text,
     configuration jsonb,
     deleted boolean not null,
     paused boolean not null,
@@ -120,30 +120,10 @@ INSERT INTO am.scan_address_discovered_by (discovery_id, discovered_by) values
     -- other, feature modules
     (1000, 'git_hooks');
 
-CREATE TABLE am.job_status (
-    status_id integer not null primary key,
-    status required_text
-);
-
-INSERT INTO am.job_status (status_id, status) values 
-    (1, 'started'),
-    (2, 'paused'),
-    (3, 'canceled'),
-    (4, 'finished');
-
-
-CREATE TABLE am.jobs (
-    job_id bigserial not null primary key,
-    organization_id integer REFERENCES am.organizations (organization_id),
-    scan_group_id integer REFERENCES am.scan_group (scan_group_id),
-    job_timestamp bigint,
-    job_status integer REFERENCES am.job_status (status_id)
-);
-
-CREATE TABLE am.job_events (
+CREATE TABLE am.scan_group_events (
     event_id bigserial not null primary key,
     organization_id integer REFERENCES am.organizations (organization_id),
-    job_id bigint REFERENCES am.jobs (job_id),
+    scan_group_id bigint REFERENCES am.scan_group (scan_group_id),
     event_user_id integer references am.users (user_id), 
     event_time bigint,
     event_description text,
@@ -158,8 +138,9 @@ CREATE TABLE am.scan_group_addresses (
     ip_address varchar(256),
     discovered_timestamp bigint,
     discovery_id integer REFERENCES am.scan_address_discovered_by (discovery_id),
-    last_job_id bigint REFERENCES am.jobs (job_id),
+    last_scanned_timestamp bigint,
     last_seen_timestamp bigint,
+    confidence_score float,
     is_soa boolean not null,
     is_wildcard_zone boolean not null,
     is_hosted_service boolean not null,
@@ -185,7 +166,8 @@ CREATE TABLE am.scan_group_findings (
     scan_group_id integer REFERENCES am.scan_group (scan_group_id),
     address_id integer REFERENCES am.scan_group_addresses (address_id) on delete cascade,
     finding_id integer REFERENCES am.scan_finding_types (finding_id),
-    job_id integer REFERENCES am.jobs (job_id),
+    discovered_timestamp bigint not null,
+    last_seen_timestamp bigint not null,
     custom_description text,
     data jsonb
 );
@@ -196,9 +178,7 @@ DROP TABLE am.scan_group_findings;
 DROP TABLE am.scan_finding_types;
 DROP INDEX am.idx_scan_group_addresses_address_id;
 DROP TABLE am.scan_group_addresses;
-DROP TABLE am.job_events;
-DROP TABLE am.jobs;
-DROP TABLE am.job_status;
+DROP TABLE am.scan_group_events;
 DROP TABLE am.scan_address_discovered_by;
 DROP TABLE am.scan_group;
 DROP INDEX am.idx_lower_users_email;

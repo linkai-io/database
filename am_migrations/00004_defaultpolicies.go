@@ -120,27 +120,27 @@ func buildPolicies() map[string]ladon.Policy {
 		[]string{am.RNFindingsFindings},
 	)
 
-	policies["manageJobServicePolicy"] = createPolicy(
-		"Manage Job Service (start, stop, pause, cancel etc)",
-		[]byte("{\"key\":\"manageJobServicePolicy\"}"),
+	policies["manageEventServicePolicy"] = createPolicy(
+		"Manage Event Service (create, delete)",
+		[]byte("{\"key\":\"manageEventServicePolicy\"}"),
 		//subjects
 		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
 		//actions
 		crud,
 		//resources
-		[]string{am.RNJobService},
+		[]string{am.RNEventService},
 	)
 
 	// editor and reviewer can only read
-	policies["readJobServicePolicy"] = createPolicy(
-		"Read Only Job Service access",
-		[]byte("{\"key\":\"readJobServicePolicy\"}"),
+	policies["readEventServicePolicy"] = createPolicy(
+		"Read Only Event Service access",
+		[]byte("{\"key\":\"readEventServicePolicy\"}"),
 		//subjects
 		[]string{am.EditorRole, am.ReviewerRole},
 		//actions
 		[]string{"read"},
 		//resources
-		[]string{am.RNJobService},
+		[]string{am.RNEventService},
 	)
 
 	policies["manageTagServicePolicy"] = createPolicy(
