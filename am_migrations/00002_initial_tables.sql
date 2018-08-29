@@ -141,6 +141,7 @@ CREATE TABLE am.scan_group_addresses (
     last_scanned_timestamp bigint,
     last_seen_timestamp bigint,
     confidence_score float,
+    user_confidence_score float,
     is_soa boolean not null,
     is_wildcard_zone boolean not null,
     is_hosted_service boolean not null,

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/linkai-io/am/pkg/secrets"
@@ -58,10 +59,34 @@ func main() {
 		log.Fatalf("error getting database string: %s\n", err)
 	}
 
-	db, err := sql.Open(driver, dbstring)
-	if err != nil {
-		log.Fatalf("error opening db connection: %s\n", err)
+	ticker := time.NewTicker(5 * time.Second)
+	stopper := time.After(1 * time.Minute)
+	defer ticker.Stop()
+
+	var db *sql.DB
+	for {
+		select {
+		case <-ticker.C:
+			db, err = sql.Open(driver, dbstring)
+			if err != nil {
+				log.Fatalf("error opening db connection: %s\n", err)
+			}
+			if err == nil {
+				goto READY
+			}
+			log.Printf("error connecting to db, retrying in 5 seconds...\n")
+		case <-stopper:
+			db, err = sql.Open(driver, dbstring)
+			if err != nil {
+				log.Fatalf("error opening db connection: %s\n", err)
+			}
+			if err != nil {
+				log.Fatalf("error connecting to db after 1 minute: %s\n", err)
+			}
+
+		}
 	}
+READY:
 
 	arguments := []string{}
 	if len(args) > 3 {
