@@ -112,9 +112,10 @@ INSERT INTO am.scan_address_discovered_by (discovery_id, discovered_by) values
     (100, 'ns_query_other'),
     (101, 'ns_query_ip_to_name'),
     (102, 'ns_query_name_to_ip'),
+    (103, 'ns_query_axfr'),
     -- dns brute module 200-300
     (200, 'dns_brute_forcer'),
-    (201, 'dns_axfr'),
+    (201, 'dns_mutator'),
     -- web modules 300 - 999
     (300, 'web_crawler'),
     -- other, feature modules
