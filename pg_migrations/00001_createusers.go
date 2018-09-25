@@ -60,6 +60,7 @@ func getServicePasswords(dbsecrets *secrets.DBSecrets, users []string) (map[stri
 func Down00001(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
 	for _, service := range users {
+
 		if _, err := tx.Exec("DROP USER " + service); err != nil {
 			return err
 		}

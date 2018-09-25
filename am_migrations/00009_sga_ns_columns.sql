@@ -1,7 +1,7 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
 alter table am.scan_group_addresses
-    add column found_from bigint,
+    add column found_from varchar(128),
     add column ns_record int,
     add column address_hash varchar(128);
 
