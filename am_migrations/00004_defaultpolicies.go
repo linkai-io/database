@@ -2,21 +2,13 @@ package migration
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"os"
 
 	uuid "github.com/gofrs/uuid"
-	"github.com/jackc/pgx"
 	"github.com/linkai-io/am/am"
-	"github.com/linkai-io/am/pkg/auth/ladonauth"
-	"github.com/linkai-io/am/pkg/secrets"
+	"github.com/linkai-io/database/pkg/migration"
 	"github.com/ory/ladon"
 	"github.com/pressly/goose"
-)
-
-var (
-	crud = []string{"create", "read", "update", "delete"}
 )
 
 func init() {
@@ -24,14 +16,14 @@ func init() {
 }
 
 func Up00004(tx *sql.Tx) error {
-	m, err := initPolicyManager()
+	m, err := migration.InitPolicyManager()
 	if err != nil {
 		return err
 	}
 	policies := buildPolicies()
 	for name, policy := range policies {
 		if err := m.Create(policy); err != nil {
-			return fmt.Errorf("%s policy failed creation: %s\n", name, err)
+			return fmt.Errorf("%s policy failed creation: %s", name, err)
 		}
 	}
 	// This code is executed when the migration is applied.
@@ -43,7 +35,7 @@ func buildPolicies() map[string]ladon.Policy {
 
 	policies["systemManagementPolicy"] = createSystemPolicy()
 
-	policies["manageOrganizationPolicy"] = createPolicy(
+	policies["manageOrganizationPolicy"] = migration.CreatePolicy(
 		"Manage Customer Organization",
 		[]byte("{\"key\":\"manageOrganizationPolicy\"}"),
 		//subjects
@@ -54,124 +46,124 @@ func buildPolicies() map[string]ladon.Policy {
 		[]string{am.RNOrganizationManage},
 	)
 
-	policies["manageScanGroupPolicy"] = createPolicy(
+	policies["manageScanGroupPolicy"] = migration.CreatePolicy(
 		"Manage Scan Groups",
 		[]byte("{\"key\":\"manageScanGroupPolicy\"}"),
 		//subjects
 		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
 		//actions
-		crud,
+		migration.CRUD,
 		//resources
 		[]string{am.RNScanGroupGroups},
 	)
 
-	policies["readScanGroupPolicy"] = createPolicy(
+	policies["readScanGroupPolicy"] = migration.CreatePolicy(
 		"Read Only Scan Groups",
 		[]byte("{\"key\":\"readScanGroupPolicy\"}"),
 		//subjects
 		[]string{am.EditorRole, am.ReviewerRole},
 		//actions
-		[]string{"read"},
+		migration.READ,
 		//resources
 		[]string{am.RNScanGroupGroups},
 	)
 
-	policies["manageAddressesPolicy"] = createPolicy(
+	policies["manageAddressesPolicy"] = migration.CreatePolicy(
 		"Manage Addresses",
 		[]byte("{\"key\":\"manageAddressesPolicy\"}"),
 		//subjects
 		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
 		//actions
-		crud,
+		migration.CRUD,
 		//resources
 		[]string{am.RNAddressAddresses},
 	)
 
-	policies["readAddressesPolicy"] = createPolicy(
+	policies["readAddressesPolicy"] = migration.CreatePolicy(
 		"Read Only Addresses",
 		[]byte("{\"key\":\"readAddressesPolicy\"}"),
 		//subjects
 		[]string{am.EditorRole, am.ReviewerRole},
 		//actions
-		[]string{"read"},
+		migration.READ,
 		//resources
 		[]string{am.RNAddressAddresses},
 	)
 
-	policies["manageFindingsPolicy"] = createPolicy(
+	policies["manageFindingsPolicy"] = migration.CreatePolicy(
 		"Manage Findings",
 		[]byte("{\"key\":\"manageFindingsPolicy\"}"),
 		//subjects
 		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
 		//actions
-		crud,
+		migration.CRUD,
 		//resources
 		[]string{am.RNFindingsFindings},
 	)
 
-	policies["readFindingsPolicy"] = createPolicy(
+	policies["readFindingsPolicy"] = migration.CreatePolicy(
 		"Read Only Findings",
 		[]byte("{\"key\":\"readFindingsPolicy\"}"),
 		//subjects
 		[]string{am.EditorRole, am.ReviewerRole},
 		//actions
-		[]string{"read"},
+		migration.READ,
 		//resources
 		[]string{am.RNFindingsFindings},
 	)
 
-	policies["manageEventServicePolicy"] = createPolicy(
+	policies["manageEventServicePolicy"] = migration.CreatePolicy(
 		"Manage Event Service (create, delete)",
 		[]byte("{\"key\":\"manageEventServicePolicy\"}"),
 		//subjects
 		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
 		//actions
-		crud,
+		migration.CRUD,
 		//resources
 		[]string{am.RNEventService},
 	)
 
 	// editor and reviewer can only read
-	policies["readEventServicePolicy"] = createPolicy(
+	policies["readEventServicePolicy"] = migration.CreatePolicy(
 		"Read Only Event Service access",
 		[]byte("{\"key\":\"readEventServicePolicy\"}"),
 		//subjects
 		[]string{am.EditorRole, am.ReviewerRole},
 		//actions
-		[]string{"read"},
+		migration.READ,
 		//resources
 		[]string{am.RNEventService},
 	)
 
-	policies["manageTagServicePolicy"] = createPolicy(
+	policies["manageTagServicePolicy"] = migration.CreatePolicy(
 		"Manage Tag Service (create tech stacks, groups, add tags etc)",
 		[]byte("{\"key\":\"manageTagServicePolicy\"}"),
 		//subjects
 		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole, am.EditorRole},
 		//actions
-		crud,
+		migration.CRUD,
 		[]string{am.RNTagServiceStacks, am.RNTagServiceGroups, am.RNTagServiceTagging, am.RNTagServiceCustom},
 	)
 
 	// reviewer can only read
-	policies["readTagServicePolicy"] = createPolicy(
+	policies["readTagServicePolicy"] = migration.CreatePolicy(
 		"Read Only access to Tag Service",
 		[]byte("{\"key\":\"readTagServicePolicy\"}"),
 		//subjects
 		[]string{am.ReviewerRole},
 		//actions
-		[]string{"read"},
+		migration.READ,
 		[]string{am.RNTagServiceStacks, am.RNTagServiceGroups, am.RNTagServiceTagging},
 	)
 
 	// reviewer can create custom tags (only they can see)
-	policies["manageTagServiceCustom"] = createPolicy(
+	policies["manageTagServiceCustom"] = migration.CreatePolicy(
 		"Manage Custom Tags access to Tag Service",
 		[]byte("{\"key\":\"manageTagServiceCustom\"}"),
 		//subjects
 		[]string{am.ReviewerRole},
 		//actions
-		crud,
+		migration.CRUD,
 		[]string{am.RNTagServiceCustom},
 	)
 
@@ -184,7 +176,7 @@ func buildPolicies() map[string]ladon.Policy {
 func Down00004(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
 
-	m, err := initPolicyManager()
+	m, err := migration.InitPolicyManager()
 	if err != nil {
 		return err
 	}
@@ -215,24 +207,6 @@ func Down00004(tx *sql.Tx) error {
 	return nil
 }
 
-func createPolicy(description string, meta []byte, subjects, actions, resources []string) ladon.Policy {
-	id, err := uuid.NewV4()
-	if err != nil {
-		panic(err) // should never happen really
-	}
-
-	return &ladon.DefaultPolicy{
-		ID:          id.String(),
-		Description: description,
-		Meta:        meta,
-		Subjects:    subjects,
-		Actions:     actions,
-		Resources:   resources,
-		Effect:      ladon.AllowAccess,
-		Conditions:  ladon.Conditions{},
-	}
-}
-
 // For allowing system users full access to services via the RNSystem resource.
 func createSystemPolicy() ladon.Policy {
 	id, err := uuid.NewV4()
@@ -245,33 +219,9 @@ func createSystemPolicy() ladon.Policy {
 		Description: "System Management Policy",
 		Meta:        []byte("{\"key\":\"systemManagementPolicy\"}"),
 		Subjects:    []string{am.SystemRole, am.SystemSupportRole},
-		Actions:     crud,
+		Actions:     migration.CRUD,
 		Resources:   []string{am.RNSystem},
 		Effect:      ladon.AllowAccess,
 		Conditions:  ladon.Conditions{},
 	}
-}
-
-func initPolicyManager() (*ladonauth.LadonPolicyManager, error) {
-	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
-	dbstring, err := dbsecrets.DBString("linkai_admin")
-	if err != nil {
-		return nil, err
-	}
-
-	if dbstring == "" {
-		return nil, errors.New("db string not set")
-	}
-
-	conf, err := pgx.ParseConnectionString(dbstring)
-	if err != nil {
-		return nil, err
-	}
-	p, err := pgx.NewConnPool(pgx.ConnPoolConfig{ConnConfig: conf})
-	if err != nil {
-		return nil, err
-	}
-	m := ladonauth.NewPolicyManager(p, "pgx")
-	err = m.Init()
-	return m, err
 }

@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:f1e4fb21c0aeecbfd8f3652264c4a3e0a131e435d8ecb2b60630d44b78cad202"
+  digest = "1:ebbafafb9f73ce092fd59c81323a99f3b8e552dcc2ef1104b40abee66e004506"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -37,8 +37,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "ea2d2b9a8808d0c390d966daf855a7b3b74bc44e"
-  version = "v1.15.19"
+  revision = "2324d8a7db41970a80d19791bd30b94f632ce0cc"
+  version = "v1.15.58"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -49,31 +49,39 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:5abd6a22805b1919f6a6bca0ae58b13cef1f3412812f38569978f43ef02743d4"
+  digest = "1:15e27372d379b45b18ac917b9dafc45c45485239490ece18cca97a12f9591146"
   name = "github.com/go-ini/ini"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5cf292cae48347c2490ac1a58fe36735fb78df7e"
-  version = "v1.38.2"
+  revision = "9c8236e659b76e87bf02044d06fde8683008ff3e"
+  version = "v1.39.0"
 
 [[projects]]
-  digest = "1:26f2ad8a198a88c3605401186a6be538326e7fbf1f14cb3ef4e0027c4f755f2a"
+  digest = "1:ce579162ae1341f3e5ab30c0dce767f28b1eb6a81359aad01723f1ba6b4becdf"
   name = "github.com/gofrs/uuid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "d41eeda0759468834c84365a32d1b1ec4264c75f"
-  version = "v3.1.0"
+  revision = "370558f003bfe29580cd0f698d8640daccdcc45c"
+  version = "v3.1.1"
+
+[[projects]]
+  digest = "1:3a26588bc48b96825977c1b3df964f8fd842cd6860cc26370588d3563433cf11"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d460ce9f8df2e77fb1ba55ca87fafed96c607494"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:cf296baa185baae04a9a7004efee8511d08e2f5f51d4cbe5375da89722d681db"
+  digest = "1:8ec8d88c248041a6df5f6574b87bc00e7e0b493881dad2e7ef47b11dc69093b5"
   name = "github.com/hashicorp/golang-lru"
   packages = [
     ".",
     "simplelru",
   ]
   pruneopts = "UT"
-  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
+  revision = "20f1fb78b0740ba8c3cb143a61e86ba5c8669768"
 
 [[projects]]
   digest = "1:8dfbec76b4834d96c37ba4c4969fc47c9a15e67c5a7eecfa031fbe67dab50429"
@@ -110,7 +118,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ec724214fd56ce1f35e1584ab944be96a681cd0f591f9e14c81478b477dac993"
+  digest = "1:1dfc6b5a65d07332c56d52ddc74e39b9f7c07a950742ed142a11bf2466908c3a"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -119,7 +127,7 @@
     "pkg/secrets",
   ]
   pruneopts = "UT"
-  revision = "4336c8be05f56832d44d52d027246401c5cbfd95"
+  revision = "93ca8d53a7a07f66f5471a4a2db3686f4b7cae38"
 
 [[projects]]
   digest = "1:7188771d3da3b536a4b5d1eaae497b40911222761bb48f835bb71dd28c5ef5a0"
@@ -133,12 +141,12 @@
   version = "v0.8.10"
 
 [[projects]]
-  digest = "1:361de06aa7ae272616cbe71c3994a654cc6316324e30998e650f7765b20c5b33"
+  digest = "1:e5d0bd87abc2781d14e274807a470acd180f0499f8bf5bb18606e9ec22ad9de9"
   name = "github.com/pborman/uuid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
-  version = "v1.1"
+  revision = "adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1"
+  version = "v1.2"
 
 [[projects]]
   digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"

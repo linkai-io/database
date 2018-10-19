@@ -4,24 +4,22 @@ import (
 	"context"
 )
 
-type CoordinatorStats struct {
-	NumWorkers          int64
-	NumActiveScanGroups int64
-}
+const (
+	CoordinatorServiceKey = "coordinatorservice"
+)
 
 type ScanGroupStats struct {
 }
 
 type CoordinatorService interface {
+	Init(config []byte) error
 	// externally accessable rpcs
-	WorkerRegistration(ctx context.Context, workerID string) (*WorkerConfig, error)
-	SystemStats(ctx context.Context, userContext UserContext) (*CoordinatorStats, error)
-	GroupStats(ctx context.Context, userContext UserContext, scanGroupID int) (*ScanGroupStats, error)
+	//GroupStats(ctx context.Context, userContext UserContext, scanGroupID int) (*ScanGroupStats, error)
 	StartGroup(ctx context.Context, userContext UserContext, scanGroupID int) error
-	StopGroup(ctx context.Context, userContext UserContext, scanGroupID int) error
-	DeleteGroup(ctx context.Context, userContext UserContext, scanGroupID int) error
+	//StopGroup(ctx context.Context, userContext UserContext, scanGroupID int) error
+	//DeleteGroup(ctx context.Context, userContext UserContext, scanGroupID int) error
 
 	// internal methods
-	StartWorker() (string, error)
-	StopWorker(workerID string) error
+	//StartWorker() (string, error)
+	//StopWorker(workerID string) error
 }

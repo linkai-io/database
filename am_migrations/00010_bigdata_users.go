@@ -2,23 +2,23 @@ package migration
 
 import (
 	"database/sql"
-	"errors"
 	"os"
 
 	"github.com/linkai-io/am/pkg/secrets"
+	"github.com/linkai-io/database/pkg/migration"
 
 	"github.com/pressly/goose"
 )
 
-var users = []string{"bigdata_admin", "bigdata_writer", "bigdata_reader"}
+var users = []string{"bigdata_admin", "bigdata_reader"}
 
 func init() {
-	goose.AddMigration(Up00001, Down00001)
+	goose.AddMigration(Up00010, Down00010)
 }
 
-func Up00001(tx *sql.Tx) error {
+func Up00010(tx *sql.Tx) error {
 	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
-	userMap, err := getServicePasswords(dbsecrets, users)
+	userMap, err := migration.GetServicePasswords(dbsecrets, users)
 	if err != nil {
 		return err
 	}
@@ -33,22 +33,7 @@ func Up00001(tx *sql.Tx) error {
 	return nil
 }
 
-func getServicePasswords(dbsecrets *secrets.DBSecrets, users []string) (map[string]string, error) {
-	userMap := make(map[string]string, 0)
-	for _, user := range users {
-		password, err := dbsecrets.ServicePassword(user)
-		if password == "" {
-			return nil, errors.New("empty password for user: " + user)
-		}
-		userMap[user] = password
-		if err != nil {
-			return nil, err
-		}
-	}
-	return userMap, nil
-}
-
-func Down00001(tx *sql.Tx) error {
+func Down00010(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
 	for _, service := range users {
 
