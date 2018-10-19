@@ -15,7 +15,7 @@ ALTER TABLE am.certificate_servers owner to bigdata_admin;
 CREATE TABLE am.certificate_queries (
     id serial not null primary key,
     etld varchar(512),
-    query_timestamp bigint,
+    query_timestamp bigint
 );
 
 ALTER TABLE am.certificate_queries owner to bigdata_admin;
