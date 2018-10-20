@@ -15,12 +15,12 @@ CREATE TABLE am.web_snapshots (
 
 CREATE TABLE am.web_status_text (
     status_text_id serial not null primary key,
-    status_text text not null
+    status_text text unique not null
 );
 
 CREATE TABLE am.web_mime_type (
     mime_type_id serial not null primary key,
-    mime_type text not null
+    mime_type text unique not null
 );
 
 CREATE TABLE am.web_responses (
