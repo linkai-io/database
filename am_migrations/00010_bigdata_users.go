@@ -10,7 +10,7 @@ import (
 	"github.com/pressly/goose"
 )
 
-var users = []string{"bigdata_admin", "bigdata_reader"}
+var users = []string{"bigdataservice"}
 
 func init() {
 	goose.AddMigration(Up00010, Down00010)

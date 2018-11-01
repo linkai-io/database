@@ -50,7 +50,7 @@ CREATE TABLE am.web_certificates (
     organization_id int references am.organizations (organization_id),
     scan_group_id int references am.scan_group (scan_group_id),
     response_timestamp bigint,
-    host varchar(512),
+    host_address varchar(512),
     port int,
     protocol text,
     key_exchange text,
