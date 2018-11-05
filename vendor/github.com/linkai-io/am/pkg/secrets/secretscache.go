@@ -5,17 +5,16 @@ import (
 	"strconv"
 )
 
-// DBSecrets for accessing database connection strings
-type DBSecrets struct {
+// SecretsCache for accessing database connection strings
+type SecretsCache struct {
 	Region      string
 	Environment string
 	secrets     Secrets
 }
 
-// NewDBSecrets returns an instance for acquiring the database connection string from
-// either local env vars or AWS
-func NewDBSecrets(env, region string) *DBSecrets {
-	s := &DBSecrets{Environment: env, Region: region}
+// NewSecretsCache returns an instance for acquiring the secrets from either local env vars or AWS
+func NewSecretsCache(env, region string) *SecretsCache {
+	s := &SecretsCache{Environment: env, Region: region}
 	if s.Environment != "local" {
 		s.secrets = NewAWSSecrets(region)
 	} else {
@@ -25,7 +24,7 @@ func NewDBSecrets(env, region string) *DBSecrets {
 }
 
 // DBString returns the database connection string for the environment and service
-func (s *DBSecrets) DBString(serviceKey string) (string, error) {
+func (s *SecretsCache) DBString(serviceKey string) (string, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/db/%s/dbstring", s.Environment, serviceKey))
 	if err != nil {
 		return "", err
@@ -34,7 +33,7 @@ func (s *DBSecrets) DBString(serviceKey string) (string, error) {
 }
 
 // ServicePassword retrieves the password for the initialized servicekey
-func (s *DBSecrets) ServicePassword(serviceKey string) (string, error) {
+func (s *SecretsCache) ServicePassword(serviceKey string) (string, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/db/%s/pwd", s.Environment, serviceKey))
 	if err != nil {
 		return "", err
@@ -42,7 +41,7 @@ func (s *DBSecrets) ServicePassword(serviceKey string) (string, error) {
 	return string(data), nil
 }
 
-func (s *DBSecrets) CacheConfig() (string, error) {
+func (s *SecretsCache) CacheConfig() (string, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/cache/config", s.Environment))
 	if err != nil {
 		return "", err
@@ -50,7 +49,7 @@ func (s *DBSecrets) CacheConfig() (string, error) {
 	return string(data), nil
 }
 
-func (s *DBSecrets) DiscoveryAddr() (string, error) {
+func (s *SecretsCache) DiscoveryAddr() (string, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/discovery/config", s.Environment))
 	if err != nil {
 		return "", err
@@ -58,7 +57,7 @@ func (s *DBSecrets) DiscoveryAddr() (string, error) {
 	return string(data), nil
 }
 
-func (s *DBSecrets) LoadBalancerAddr() (string, error) {
+func (s *SecretsCache) LoadBalancerAddr() (string, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/loadbalancer/config", s.Environment))
 	if err != nil {
 		return "", err
@@ -66,7 +65,7 @@ func (s *DBSecrets) LoadBalancerAddr() (string, error) {
 	return string(data), nil
 }
 
-func (s *DBSecrets) SystemOrgID() (int, error) {
+func (s *SecretsCache) SystemOrgID() (int, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/system/orgid", s.Environment))
 	if err != nil {
 		return -1, err
@@ -74,7 +73,7 @@ func (s *DBSecrets) SystemOrgID() (int, error) {
 	return strconv.Atoi(string(data))
 }
 
-func (s *DBSecrets) SystemUserID() (int, error) {
+func (s *SecretsCache) SystemUserID() (int, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/system/userid", s.Environment))
 	if err != nil {
 		return -1, err

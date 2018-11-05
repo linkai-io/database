@@ -17,7 +17,7 @@ var (
 )
 
 // GetServicePasswords returns the passwords of the supplied users via the provided DBSecrets
-func GetServicePasswords(dbsecrets *secrets.DBSecrets, users []string) (map[string]string, error) {
+func GetServicePasswords(dbsecrets *secrets.SecretsCache, users []string) (map[string]string, error) {
 	userMap := make(map[string]string, 0)
 	for _, user := range users {
 		password, err := dbsecrets.ServicePassword(user)
@@ -34,7 +34,7 @@ func GetServicePasswords(dbsecrets *secrets.DBSecrets, users []string) (map[stri
 
 // InitPolicyManager for managing user policies
 func InitPolicyManager() (*ladonauth.LadonPolicyManager, error) {
-	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
+	dbsecrets := secrets.NewSecretsCache(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
 	dbstring, err := dbsecrets.DBString("linkai_admin")
 	if err != nil {
 		return nil, err

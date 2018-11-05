@@ -17,7 +17,7 @@ func init() {
 }
 
 func Up00010(tx *sql.Tx) error {
-	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
+	dbsecrets := secrets.NewSecretsCache(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
 	userMap, err := migration.GetServicePasswords(dbsecrets, users)
 	if err != nil {
 		return err

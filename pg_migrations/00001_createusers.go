@@ -17,7 +17,7 @@ func init() {
 }
 
 func Up00001(tx *sql.Tx) error {
-	dbsecrets := secrets.NewDBSecrets(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
+	dbsecrets := secrets.NewSecretsCache(os.Getenv("APP_ENV"), os.Getenv("APP_REGION"))
 	adminPassword, err := dbsecrets.ServicePassword("linkai_admin")
 	userMap, err := getServicePasswords(dbsecrets, users)
 	if err != nil {
@@ -42,7 +42,7 @@ func Up00001(tx *sql.Tx) error {
 	return nil
 }
 
-func getServicePasswords(dbsecrets *secrets.DBSecrets, users []string) (map[string]string, error) {
+func getServicePasswords(dbsecrets *secrets.SecretsCache, users []string) (map[string]string, error) {
 	userMap := make(map[string]string, 0)
 	for _, user := range users {
 		password, err := dbsecrets.ServicePassword(user)

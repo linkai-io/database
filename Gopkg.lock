@@ -118,7 +118,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1dfc6b5a65d07332c56d52ddc74e39b9f7c07a950742ed142a11bf2466908c3a"
+  digest = "1:184de4265c1e424dbce6b37558282041f94ba918572eb233b121cc9b575c2451"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -127,7 +127,7 @@
     "pkg/secrets",
   ]
   pruneopts = "UT"
-  revision = "93ca8d53a7a07f66f5471a4a2db3686f4b7cae38"
+  revision = "6c75ebab0b7cab3fec0b6ebb3de67d58aaecba96"
 
 [[projects]]
   digest = "1:7188771d3da3b536a4b5d1eaae497b40911222761bb48f835bb71dd28c5ef5a0"

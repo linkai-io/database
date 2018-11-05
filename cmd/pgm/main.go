@@ -53,7 +53,7 @@ func main() {
 		log.Fatalf("unable to set postgres dialect: %s\n", err)
 	}
 
-	dbsecrets := secrets.NewDBSecrets(env, region)
+	dbsecrets := secrets.NewSecretsCache(env, region)
 	dbstring, err := dbsecrets.DBString("postgres")
 	if err != nil {
 		log.Fatalf("error getting database string: %s\n", err)
