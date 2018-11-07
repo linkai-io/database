@@ -10,7 +10,8 @@ CREATE TABLE am.web_snapshots (
     serialized_dom_hash varchar(512),
     serialized_dom_link text,
     snapshot_link text,
-    is_deleted boolean
+    is_deleted boolean,
+    UNIQUE(organization_id, scan_group_id, serialized_dom_hash)
 );
 
 CREATE TABLE am.web_status_text (
@@ -64,7 +65,8 @@ CREATE TABLE am.web_certificates (
     valid_from bigint,
     valid_to bigint,
     ct_compliance text,
-    is_deleted boolean
+    is_deleted boolean,
+    UNIQUE (organization_id, scan_group_id, subject_name, valid_from, valid_to)
 );
 
 -- +goose Down

@@ -11,15 +11,15 @@ import (
 )
 
 func init() {
-	goose.AddMigration(Up00014, Down00014)
+	goose.AddMigration(Up00012, Down00012)
 }
 
-func Up00014(tx *sql.Tx) error {
+func Up00012(tx *sql.Tx) error {
 	m, err := migration.InitPolicyManager()
 	if err != nil {
 		return err
 	}
-	policies := buildPolicies()
+	policies := buildUp00012Policies()
 	for name, policy := range policies {
 		if err := m.Create(policy); err != nil {
 			return fmt.Errorf("%s policy failed creation: %s", name, err)
@@ -29,8 +29,19 @@ func Up00014(tx *sql.Tx) error {
 	return nil
 }
 
-func buildUp00014Policies() map[string]ladon.Policy {
+func buildUp00012Policies() map[string]ladon.Policy {
 	policies := make(map[string]ladon.Policy, 0)
+
+	policies["manageWebDataPolicy"] = migration.CreatePolicy(
+		"Manage Web Data",
+		[]byte("{\"key\":\"manageWebDataPolicy\"}"),
+		//subjects
+		[]string{am.OwnerRole, am.AdminRole, am.AuditorRole},
+		//actions
+		migration.CRUD,
+		//resources
+		[]string{am.RNWebData},
+	)
 
 	policies["manageWebDataResponsesPolicy"] = migration.CreatePolicy(
 		"Manage Web Data Responses",
@@ -44,8 +55,8 @@ func buildUp00014Policies() map[string]ladon.Policy {
 	)
 
 	policies["readWebDataResponsesPolicy"] = migration.CreatePolicy(
-		"Read Only Web Data Certificates",
-		[]byte("{\"key\":\"readAddressesPolicy\"}"),
+		"Read Only Web Data Responses",
+		[]byte("{\"key\":\"readWebDataResponsesPolicy\"}"),
 		//subjects
 		[]string{am.EditorRole, am.ReviewerRole},
 		//actions
@@ -101,10 +112,10 @@ func buildUp00014Policies() map[string]ladon.Policy {
 	return policies
 }
 
-// Down00014 rebuilds the policies to get the keys, and creates a map,
+// Down00012 rebuilds the policies to get the keys, and creates a map,
 // extract all policies from the db and attempt to match the meta keys
 // and then delete those ids that match.
-func Down00014(tx *sql.Tx) error {
+func Down00012(tx *sql.Tx) error {
 	// This code is executed when the migration is rolled back.
 
 	m, err := migration.InitPolicyManager()
@@ -112,7 +123,7 @@ func Down00014(tx *sql.Tx) error {
 		return err
 	}
 
-	policies := buildUp00014Policies()
+	policies := buildUp00012Policies()
 
 	keys := make(map[string]struct{}, 0)
 	for _, p := range policies {
