@@ -26,7 +26,6 @@ grant select on am.ladon_policy_resource_rel to linkai_user;
 
 -- eventservice permissions
 grant linkai_user to eventservice;
-revoke all on schema am from eventservice;
 grant select, insert, update, delete on am.scan_group_events to eventservice;
 grant references (organization_id) on table am.organizations to eventservice;
 grant references (user_id) on table am.users to eventservice;

@@ -15,6 +15,8 @@ ALTER TABLE am.certificate_queries owner to bigdataservice;
 CREATE TABLE am.certificates (
     certificate_id bigserial not null primary key,
     inserted_timestamp bigint,
+    server_name text not null,
+    server_index bigint,
     etld varchar(512) not null,
     cert_hash varchar(256) not null unique,
     serial_number varchar(256),

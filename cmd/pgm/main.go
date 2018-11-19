@@ -63,6 +63,8 @@ func main() {
 	stopper := time.After(1 * time.Minute)
 	defer ticker.Stop()
 
+	log.Printf("attempting to connect to db server\n")
+
 	var db *sql.DB
 	for {
 		select {
@@ -89,8 +91,8 @@ func main() {
 READY:
 
 	arguments := []string{}
-	if len(args) > 3 {
-		arguments = append(arguments, args[3:]...)
+	if len(args) > 1 {
+		arguments = append(arguments, args[1:]...)
 	}
 
 	if err := goose.Run(command, db, *dir, arguments...); err != nil {
@@ -107,12 +109,12 @@ func usage() {
 var (
 	usagePrefix = `Usage: pgm [OPTIONS] COMMAND
 Examples:
-	pgm -dir ./am_migrations status
-	pgm -dir ./am_migrations create init sql
-	pgm -dir ./am_migrations create something_from_go_file go
-	pgm -dir ./am_migrations up
-	pgm -dir ./am_migrations down
-	pgm -dir ./am_migrations redo
+	pgm -dir ./pg_migrations status
+	pgm -dir ./pg_migrations create init sql
+	pgm -dir ./pg_migrations create something_from_go_file go
+	pgm -dir ./pg_migrations up
+	pgm -dir ./pg_migrations down
+	pgm -dir ./pg_migrations redo
 Options:
 `
 

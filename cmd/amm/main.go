@@ -63,6 +63,8 @@ func main() {
 	stopper := time.After(1 * time.Minute)
 	defer ticker.Stop()
 
+	log.Printf("attempting to connect to db server\n")
+
 	var db *sql.DB
 	for {
 		select {
@@ -89,12 +91,12 @@ func main() {
 READY:
 
 	arguments := []string{}
-	if len(args) > 3 {
-		arguments = append(arguments, args[3:]...)
+	if len(args) > 1 {
+		arguments = append(arguments, args[1:]...)
 	}
 
 	if err := goose.Run(command, db, *dir, arguments...); err != nil {
-		log.Fatalf("goose run: %v", err)
+		log.Fatalf("pgm run: %v", err)
 	}
 }
 
