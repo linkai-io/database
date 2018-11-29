@@ -19,19 +19,19 @@ const (
 
 	createOrgStatement = `with org as (
 		insert into am.organizations (
-			organization_name, organization_custom_id, user_pool_id, identity_pool_id, 
+			organization_name, organization_custom_id, user_pool_id, user_pool_client_id, user_pool_client_secret, identity_pool_id, 
 			owner_email, first_name, last_name, phone, country, state_prefecture, street, 
 			address1, address2, city, postal_code, creation_time, status_id, deleted, subscription_id
 		)
 		values 
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, false, $18)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, false, $20)
 		returning organization_id
 	) 
 	insert into am.users (
 			organization_id, user_custom_id, email, first_name, last_name, user_status_id, creation_time, deleted
 		) 
 		values
-			( (select org.organization_id from org), $19, $20, $21, $22, $23, $24, false) returning organization_id, user_id;`
+			( (select org.organization_id from org), $21, $22, $23, $24, $25, $26, false) returning organization_id, user_id;`
 
 	addRoleStatement = `INSERT INTO am.ladon_role (role_id, organization_id, role_name) values ($1,$2,$3)`
 
@@ -63,7 +63,7 @@ func createSystemOrg(orgName string, name string, tx *sql.Tx) error {
 
 	now := time.Now().UnixNano()
 
-	row := stmt.QueryRow(orgName, coid, "empty", "empty", name+"@linkai.io", "linkai", name, "+81", "japan",
+	row := stmt.QueryRow(orgName, coid, "empty", "empty", "empty", "empty", name+"@linkai.io", "linkai", name, "+81", "japan",
 		name, name, "", "", name, name, now, am.OrgStatusActive, am.SubscriptionSystem,
 		cuid, name+"@linkai.io", "linkai", name, am.UserStatusActive, now)
 

@@ -34,6 +34,8 @@ CREATE TABLE am.organizations (
     organization_name required_text unique,
     organization_custom_id required_text unique,
     user_pool_id required_text,
+    user_pool_client_id required_text,
+    user_pool_client_secret required_text,
     identity_pool_id required_text,
     owner_email required_text,
     first_name required_text,

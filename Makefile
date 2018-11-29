@@ -1,6 +1,8 @@
-SERVICES = am_migrations pg_migrations
+SERVICES = am_migrations pg_migrations db_systemids
 APP_ENV = dev
-
+systemids:
+	docker build -t linkai_db_systemids -f Dockerfile.db_systemids .
+	
 pgm:
 	docker build -t linkai_pg_migrations -f Dockerfile.pgm .
 

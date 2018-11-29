@@ -96,7 +96,7 @@ READY:
 	}
 
 	if err := goose.Run(command, db, *dir, arguments...); err != nil {
-		log.Fatalf("pgm run: %v", err)
+		log.Fatalf("amm run: %v", err)
 	}
 }
 
