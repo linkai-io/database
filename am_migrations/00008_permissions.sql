@@ -9,7 +9,9 @@ revoke all on all functions in schema am from public;
 -- allows usage on am schema, but disable creating tables.
 create role linkai_user with inherit;
 grant usage on schema am to linkai_user;
-grant select,update on all sequences in schema am to linkai_user;
+grant select, update on all sequences in schema am to linkai_user;
+alter default privileges in schema am grant usage on sequences to linkai_user;
+alter default privileges in schema am grant select on sequences to linkai_user; 
 grant select on am.ladon_role to linkai_user;
 grant select on am.ladon_role_member to linkai_user;
 grant select on am.ladon_policy to linkai_user;
