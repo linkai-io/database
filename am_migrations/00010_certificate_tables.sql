@@ -10,8 +10,6 @@ CREATE TABLE am.certificate_queries (
     query_timestamp bigint
 );
 
-ALTER TABLE am.certificate_queries owner to bigdataservice;
-
 CREATE TABLE am.certificates (
     certificate_id bigserial not null primary key,
     inserted_timestamp bigint,
@@ -31,9 +29,6 @@ CREATE TABLE am.certificates (
     ip_addresses text, 
     email_addresses text
 );
-
-ALTER TABLE am.certificates owner to bigdataservice;
-
 
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.

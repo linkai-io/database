@@ -94,6 +94,7 @@ func Down00001(tx *sql.Tx) error {
 		_, err = tx.Exec("DROP USER linkai_admin")
 	} else {
 		_, err = tx.Exec("DROP ROLE linkai_admin")
+		_, err = tx.Exec("DROP ROLE linkai_user")
 	}
 	return err
 }
