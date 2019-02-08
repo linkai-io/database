@@ -69,7 +69,9 @@ func UserContextToDomain(in *prototypes.UserContext) am.UserContext {
 	return &am.UserContextData{
 		TraceID:   in.TraceID,
 		OrgID:     int(in.OrgID),
+		OrgCID:    in.OrgCID,
 		UserID:    int(in.UserID),
+		UserCID:   in.UserCID,
 		Roles:     in.Roles,
 		IPAddress: in.IPAddress,
 	}
@@ -80,6 +82,8 @@ func DomainToUserContext(in am.UserContext) *prototypes.UserContext {
 	return &prototypes.UserContext{
 		TraceID:   in.GetTraceID(),
 		OrgID:     int32(in.GetOrgID()),
+		OrgCID:    in.GetOrgCID(),
+		UserCID:   in.GetUserCID(),
 		UserID:    int32(in.GetUserID()),
 		Roles:     in.GetRoles(),
 		IPAddress: in.GetIPAddress(),
@@ -311,9 +315,11 @@ func ScanGroupToDomain(in *scangroup.Group) *am.ScanGroup {
 		GroupID:              int(in.GroupID),
 		GroupName:            in.GroupName,
 		CreationTime:         in.CreationTime,
-		CreatedBy:            int(in.CreatedBy),
+		CreatedBy:            in.CreatedBy,
+		CreatedByID:          int(in.CreatedByID),
 		OriginalInputS3URL:   in.OriginalInputS3URL,
-		ModifiedBy:           int(in.ModifiedBy),
+		ModifiedBy:           in.ModifiedBy,
+		ModifiedByID:         int(in.ModifiedByID),
 		ModifiedTime:         in.ModifiedTime,
 		ModuleConfigurations: ModuleToDomain(in.ModuleConfiguration),
 		Paused:               in.Paused,
@@ -328,9 +334,11 @@ func DomainToScanGroup(in *am.ScanGroup) *scangroup.Group {
 		GroupID:             int32(in.GroupID),
 		GroupName:           in.GroupName,
 		CreationTime:        in.CreationTime,
-		CreatedBy:           int32(in.CreatedBy),
+		CreatedBy:           in.CreatedBy,
+		CreatedByID:         int32(in.CreatedByID),
 		OriginalInputS3URL:  in.OriginalInputS3URL,
-		ModifiedBy:          int32(in.ModifiedBy),
+		ModifiedBy:          in.ModifiedBy,
+		ModifiedByID:        int32(in.ModifiedByID),
 		ModifiedTime:        in.ModifiedTime,
 		ModuleConfiguration: DomainToModule(in.ModuleConfigurations),
 		Paused:              in.Paused,
@@ -406,4 +414,38 @@ func CTRecordsToDomain(in map[string]*prototypes.CTRecord) map[string]*am.CTReco
 		ctRecords[k] = CTRecordToDomain(v)
 	}
 	return ctRecords
+}
+
+func DomainToCTSubdomainRecord(in *am.CTSubdomain) *prototypes.CTSubdomain {
+	return &prototypes.CTSubdomain{
+		SubdomainID:  in.SubdomainID,
+		InsertedTime: in.InsertedTime,
+		CommonName:   in.Subdomain,
+		ETLD:         in.ETLD,
+	}
+}
+
+func CTSubdomainRecordToDomain(in *prototypes.CTSubdomain) *am.CTSubdomain {
+	return &am.CTSubdomain{
+		SubdomainID:  in.SubdomainID,
+		InsertedTime: in.InsertedTime,
+		Subdomain:    in.CommonName,
+		ETLD:         in.ETLD,
+	}
+}
+
+func DomainToCTSubdomainRecords(in map[string]*am.CTSubdomain) map[string]*prototypes.CTSubdomain {
+	subRecords := make(map[string]*prototypes.CTSubdomain, len(in))
+	for k, v := range in {
+		subRecords[k] = DomainToCTSubdomainRecord(v)
+	}
+	return subRecords
+}
+
+func CTSubdomainRecordsToDomain(in map[string]*prototypes.CTSubdomain) map[string]*am.CTSubdomain {
+	subRecords := make(map[string]*am.CTSubdomain, len(in))
+	for k, v := range in {
+		subRecords[k] = CTSubdomainRecordToDomain(v)
+	}
+	return subRecords
 }

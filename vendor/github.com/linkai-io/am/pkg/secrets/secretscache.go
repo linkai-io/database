@@ -75,14 +75,6 @@ func (s *SecretsCache) DiscoveryAddr() (string, error) {
 	return string(data), nil
 }
 
-func (s *SecretsCache) LoadBalancerAddr() (string, error) {
-	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/loadbalancer/config", s.Environment))
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
 func (s *SecretsCache) WebFilePath() (string, error) {
 	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/webfilepath", s.Environment))
 	if err != nil {
@@ -98,6 +90,14 @@ func (s *SecretsCache) DNSAddresses() ([]string, error) {
 	}
 	hosts := strings.Trim(string(data), " ")
 	return strings.Split(hosts, ","), nil
+}
+
+func (s *SecretsCache) BigQueryCredentials() (string, error) {
+	data, err := s.secrets.GetSecureParameter(fmt.Sprintf("/am/%s/bigdata/ct/credentials", s.Environment))
+	if err != nil {
+		return "", err
+	}
+	return string(data), err
 }
 
 func (s *SecretsCache) SystemOrgID() (int, error) {

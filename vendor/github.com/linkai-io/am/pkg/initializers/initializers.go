@@ -3,9 +3,15 @@ package initializers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net"
+	"net/http"
+	"os"
 	"strconv"
 	"time"
+
+	"github.com/linkai-io/am/pkg/bq"
 
 	"github.com/linkai-io/am/pkg/discovery"
 
@@ -16,6 +22,7 @@ import (
 	"github.com/linkai-io/am/clients/coordinator"
 	"github.com/linkai-io/am/clients/dispatcher"
 	"github.com/linkai-io/am/clients/module"
+	"github.com/linkai-io/am/clients/organization"
 	"github.com/linkai-io/am/clients/scangroup"
 	"github.com/linkai-io/am/clients/webdata"
 	"github.com/linkai-io/am/pkg/retrier"
@@ -24,12 +31,33 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// AppConfig represents values taken from environment variables
 type AppConfig struct {
 	Env          string
 	Region       string
 	SelfRegister string
 	ServiceKey   string
 	Addr         string
+}
+
+func ServiceDiscovery(appConfig *AppConfig) string {
+	consulAddr := os.Getenv("CONSUL_HTTP_ADDR")
+	if consulAddr != "" {
+		return consulAddr
+	}
+
+	resp, err := http.Get("http://169.254.169.254/latest/meta-data/local-ipv4")
+	if err != nil {
+		log.Fatal().Err(err).Str("serviceKey", appConfig.ServiceKey).Msg("unable to get consul addr")
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal().Err(err).Str("serviceKey", appConfig.ServiceKey).Msg("unable to get consul addr")
+	}
+
+	log.Info().Str("serviceKey", appConfig.ServiceKey).Str("consul_addr", string(data)).Msg("got consul address")
+	return fmt.Sprintf("%s:8500", string(data))
 }
 
 // Self registers if SelfRegister is set to anything. Assumes valid host:port pair in appConfig.Addr is set
@@ -106,11 +134,12 @@ func State(appConfig *AppConfig) *redis.State {
 	return redisState
 }
 
-func DispatcherClient(loadBalancerAddr string) am.DispatcherService {
+// DispatcherClient connects to the dispatcher service
+func DispatcherClient() am.DispatcherService {
 	dispatcherClient := dispatcher.New()
 
 	err := retrier.RetryUntil(func() error {
-		return dispatcherClient.Init([]byte(loadBalancerAddr))
+		return dispatcherClient.Init(nil)
 	}, time.Minute*1, time.Second*3)
 
 	if err != nil {
@@ -119,12 +148,12 @@ func DispatcherClient(loadBalancerAddr string) am.DispatcherService {
 	return dispatcherClient
 }
 
-// SGClient connects to the scangroup service via load balancer
-func SGClient(loadBalancerAddr string) am.ScanGroupService {
+// SGClient connects to the scangroup service
+func SGClient() am.ScanGroupService {
 	scanGroupClient := scangroup.New()
 
 	err := retrier.RetryUntil(func() error {
-		return scanGroupClient.Init([]byte(loadBalancerAddr))
+		return scanGroupClient.Init(nil)
 	}, time.Minute*1, time.Second*3)
 
 	if err != nil {
@@ -133,12 +162,26 @@ func SGClient(loadBalancerAddr string) am.ScanGroupService {
 	return scanGroupClient
 }
 
-// AddrClient connects to the address service via load balancer
-func AddrClient(loadBalancerAddr string) am.AddressService {
+// OrgClient connects to the organization service
+func OrgClient() am.OrganizationService {
+	orgClient := organization.New()
+
+	err := retrier.RetryUntil(func() error {
+		return orgClient.Init(nil)
+	}, time.Minute*1, time.Second*3)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("error connecting to organization server")
+	}
+	return orgClient
+}
+
+// AddrClient connects to the address service
+func AddrClient() am.AddressService {
 	addrClient := address.New()
 
 	err := retrier.RetryUntil(func() error {
-		return addrClient.Init([]byte(loadBalancerAddr))
+		return addrClient.Init(nil)
 	}, time.Minute*1, time.Second*3)
 
 	if err != nil {
@@ -147,12 +190,12 @@ func AddrClient(loadBalancerAddr string) am.AddressService {
 	return addrClient
 }
 
-// CoordClient connects to the coordinator service via the load balancer
-func CoordClient(loadBalancerAddr string) am.CoordinatorService {
+// CoordClient connects to the coordinator service
+func CoordClient() am.CoordinatorService {
 	coordClient := coordinator.New()
 
 	err := retrier.RetryUntil(func() error {
-		return coordClient.Init([]byte(loadBalancerAddr))
+		return coordClient.Init(nil)
 	}, time.Minute*1, time.Second*3)
 
 	if err != nil {
@@ -161,12 +204,12 @@ func CoordClient(loadBalancerAddr string) am.CoordinatorService {
 	return coordClient
 }
 
-// WebDataClient connects to the webdata service via load balancer
-func WebDataClient(loadBalancerAddr string) am.WebDataService {
+// WebDataClient connects to the webdata service
+func WebDataClient() am.WebDataService {
 	webDataClient := webdata.New()
 
 	err := retrier.RetryUntil(func() error {
-		return webDataClient.Init([]byte(loadBalancerAddr))
+		return webDataClient.Init(nil)
 	}, time.Minute*1, time.Second*3)
 
 	if err != nil {
@@ -175,12 +218,12 @@ func WebDataClient(loadBalancerAddr string) am.WebDataService {
 	return webDataClient
 }
 
-// BigDataClient connects to the bigdata service via load balancer
-func BigDataClient(loadBalancerAddr string) am.BigDataService {
+// BigDataClient connects to the bigdata service
+func BigDataClient() am.BigDataService {
 	bigDataClient := bdc.New()
 
 	err := retrier.RetryUntil(func() error {
-		return bigDataClient.Init([]byte(loadBalancerAddr))
+		return bigDataClient.Init(nil)
 	}, time.Minute*1, time.Second*3)
 
 	if err != nil {
@@ -189,12 +232,29 @@ func BigDataClient(loadBalancerAddr string) am.BigDataService {
 	return bigDataClient
 }
 
+func BigQueryClient(cfg *bq.ClientConfig, credentials []byte) bq.BigQuerier {
+	bqClient := bq.NewClient()
+	cfgData, err := json.Marshal(cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to marshal bigquery config")
+	}
+
+	err = retrier.RetryUntil(func() error {
+		return bqClient.Init(cfgData, credentials)
+	}, time.Minute*1, time.Second*3)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("error initializing bigquery client")
+	}
+	return bqClient
+}
+
 // Module returns the connected module depending on moduleType
-func Module(state *redis.State, loadBalancerAddr string, moduleType am.ModuleType) am.ModuleService {
+func Module(state *redis.State, moduleType am.ModuleType) am.ModuleService {
 	switch moduleType {
 	case am.NSModule:
 		nsClient := module.New()
-		cfg := &module.Config{Addr: loadBalancerAddr, ModuleType: am.NSModule}
+		cfg := &module.Config{ModuleType: am.NSModule}
 		data, _ := json.Marshal(cfg)
 
 		err := retrier.RetryUntil(func() error {
@@ -207,7 +267,7 @@ func Module(state *redis.State, loadBalancerAddr string, moduleType am.ModuleTyp
 		return nsClient
 	case am.BruteModule:
 		bruteClient := module.New()
-		cfg := &module.Config{Addr: loadBalancerAddr, ModuleType: am.BruteModule, Timeout: 600}
+		cfg := &module.Config{ModuleType: am.BruteModule, Timeout: 600}
 		data, _ := json.Marshal(cfg)
 
 		err := retrier.RetryUntil(func() error {
@@ -220,7 +280,7 @@ func Module(state *redis.State, loadBalancerAddr string, moduleType am.ModuleTyp
 		return bruteClient
 	case am.WebModule:
 		webClient := module.New()
-		cfg := &module.Config{Addr: loadBalancerAddr, ModuleType: am.WebModule, Timeout: 600}
+		cfg := &module.Config{ModuleType: am.WebModule, Timeout: 600}
 		data, _ := json.Marshal(cfg)
 
 		err := retrier.RetryUntil(func() error {
@@ -231,15 +291,28 @@ func Module(state *redis.State, loadBalancerAddr string, moduleType am.ModuleTyp
 			log.Fatal().Err(err).Msg("unable to connect to web module client")
 		}
 		return webClient
+	case am.BigDataCTSubdomainModule:
+		bdClient := module.New()
+		cfg := &module.Config{ModuleType: am.BigDataCTSubdomainModule, Timeout: 600}
+		data, _ := json.Marshal(cfg)
+		err := retrier.RetryUntil(func() error {
+			return bdClient.Init(data)
+		}, time.Minute*1, time.Second*3)
+
+		if err != nil {
+			log.Fatal().Err(err).Msg("unable to connect to bigdata module client")
+		}
+		return bdClient
 	}
 	return nil
 }
 
-// Modules initializes all moduels and connects to them via load balancer address.
-func Modules(state *redis.State, loadBalancerAddr string) map[am.ModuleType]am.ModuleService {
+// Modules initializes all modules and connects to them
+func Modules(state *redis.State) map[am.ModuleType]am.ModuleService {
 	modules := make(map[am.ModuleType]am.ModuleService)
-	modules[am.NSModule] = Module(state, loadBalancerAddr, am.NSModule)
-	modules[am.BruteModule] = Module(state, loadBalancerAddr, am.BruteModule)
-	modules[am.WebModule] = Module(state, loadBalancerAddr, am.WebModule)
+	modules[am.NSModule] = Module(state, am.NSModule)
+	modules[am.BruteModule] = Module(state, am.BruteModule)
+	modules[am.WebModule] = Module(state, am.WebModule)
+	modules[am.BigDataCTSubdomainModule] = Module(state, am.BigDataCTSubdomainModule)
 	return modules
 }

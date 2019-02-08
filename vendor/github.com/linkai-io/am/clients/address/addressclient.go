@@ -5,7 +5,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/bsm/grpclb"
 	"github.com/linkai-io/am/am"
 	"github.com/linkai-io/am/pkg/convert"
 	"github.com/linkai-io/am/pkg/retrier"
@@ -13,10 +12,12 @@ import (
 	"github.com/linkai-io/am/protocservices/prototypes"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 )
 
 type Client struct {
 	client         service.AddressClient
+	conn           *grpc.ClientConn
 	defaultTimeout time.Duration
 }
 
@@ -25,22 +26,23 @@ func New() *Client {
 }
 
 func (c *Client) Init(config []byte) error {
-	balancer := grpc.RoundRobin(grpclb.NewResolver(&grpclb.Options{
-		Address: string(config),
-	}))
-
-	conn, err := grpc.Dial(am.AddressServiceKey, grpc.WithInsecure(), grpc.WithBalancer(balancer))
+	conn, err := grpc.DialContext(context.Background(), "srv://consul/"+am.AddressServiceKey, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
 	if err != nil {
 		return err
 	}
 
+	c.conn = conn
 	c.client = service.NewAddressClient(conn)
-
 	return nil
+}
+
+func (c *Client) SetTimeout(timeout time.Duration) {
+	c.defaultTimeout = timeout
 }
 
 func (c *Client) Get(ctx context.Context, userContext am.UserContext, filter *am.ScanGroupAddressFilter) (oid int, addresses []*am.ScanGroupAddress, err error) {
 	var resp service.Address_GetClient
+	oid = userContext.GetOrgID()
 
 	in := &service.AddressesRequest{
 		UserContext: convert.DomainToUserContext(userContext),
@@ -50,12 +52,12 @@ func (c *Client) Get(ctx context.Context, userContext am.UserContext, filter *am
 	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
 	defer cancel()
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.Get(ctxDeadline, in)
 		return errors.Wrap(retryErr, "unable to get addresses from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, nil, err
@@ -71,8 +73,14 @@ func (c *Client) Get(ctx context.Context, userContext am.UserContext, filter *am
 		if err != nil {
 			return 0, nil, err
 		}
+		// empty address
+		if addr.GetOrgID() == 0 {
+			continue
+		}
 		addresses = append(addresses, convert.AddressToDomain(addr.Addresses))
-		oid = int(addr.GetOrgID())
+		if addr.GetOrgID() != int32(oid) {
+			return 0, nil, am.ErrOrgIDMismatch
+		}
 	}
 	return oid, addresses, nil
 }
@@ -94,12 +102,12 @@ func (c *Client) Update(ctx context.Context, userContext am.UserContext, address
 	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
 	defer cancel()
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.Update(ctxDeadline, in)
 		return errors.Wrap(retryErr, "unable to update addresses from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, 0, err
@@ -119,13 +127,13 @@ func (c *Client) Count(ctx context.Context, userContext am.UserContext, groupID 
 	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
 	defer cancel()
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.Count(ctxDeadline, in)
 		return errors.Wrap(retryErr, "unable to count addresses from client")
 
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, 0, err
@@ -146,13 +154,41 @@ func (c *Client) Delete(ctx context.Context, userContext am.UserContext, groupID
 	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
 	defer cancel()
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.Delete(ctxDeadline, in)
 		return errors.Wrap(retryErr, "unable to delete addresses from client")
 
-	})
+	}, "rpc error: code = Unavailable desc")
+
+	if err != nil {
+		return 0, err
+	}
+
+	return int(resp.GetOrgID()), nil
+}
+
+func (c *Client) Ignore(ctx context.Context, userContext am.UserContext, groupID int, addressIDs []int64, ignoreValue bool) (oid int, err error) {
+	var resp *service.IgnoreAddressesResponse
+
+	in := &service.IgnoreAddressesRequest{
+		UserContext: convert.DomainToUserContext(userContext),
+		GroupID:     int32(groupID),
+		AddressIDs:  addressIDs,
+		IgnoreValue: ignoreValue,
+	}
+
+	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
+	defer cancel()
+
+	err = retrier.RetryIfNot(func() error {
+		var retryErr error
+
+		resp, retryErr = c.client.Ignore(ctxDeadline, in)
+		return errors.Wrap(retryErr, "unable to ignore addresses from client")
+
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, err

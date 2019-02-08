@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	CRUD = []string{"create", "read", "update", "delete"}
-	READ = []string{"read"}
+	CRUD        = []string{"create", "read", "update", "delete"}
+	READ        = []string{"read"}
+	CREATE      = []string{"create"}
+	CREATE_READ = []string{"read", "create"}
 )
 
 // GetServicePasswords returns the passwords of the supplied users via the provided DBSecrets

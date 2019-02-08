@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/bsm/grpclb"
 	"github.com/linkai-io/am/pkg/convert"
 	"github.com/linkai-io/am/pkg/retrier"
 	"github.com/pkg/errors"
@@ -12,10 +11,12 @@ import (
 	"github.com/linkai-io/am/am"
 	service "github.com/linkai-io/am/protocservices/bigdata"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 )
 
 type Client struct {
 	client         service.BigDataClient
+	conn           *grpc.ClientConn
 	defaultTimeout time.Duration
 }
 
@@ -24,17 +25,18 @@ func New() *Client {
 }
 
 func (c *Client) Init(config []byte) error {
-	balancer := grpc.RoundRobin(grpclb.NewResolver(&grpclb.Options{
-		Address: string(config),
-	}))
-
-	conn, err := grpc.Dial(am.BigDataServiceKey, grpc.WithInsecure(), grpc.WithBalancer(balancer))
+	conn, err := grpc.DialContext(context.Background(), "srv://consul/"+am.BigDataServiceKey, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
 	if err != nil {
 		return err
 	}
 
+	c.conn = conn
 	c.client = service.NewBigDataClient(conn)
 	return nil
+}
+
+func (c *Client) SetTimeout(timeout time.Duration) {
+	c.defaultTimeout = timeout
 }
 
 func (c *Client) GetCT(ctx context.Context, userContext am.UserContext, etld string) (time.Time, map[string]*am.CTRecord, error) {
@@ -50,13 +52,13 @@ func (c *Client) GetCT(ctx context.Context, userContext am.UserContext, etld str
 		ETLD:        etld,
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.GetCT(ctxDeadline, in)
 
 		return errors.Wrap(retryErr, "unable to get ct records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return emptyTS, nil, err
@@ -77,10 +79,10 @@ func (c *Client) AddCT(ctx context.Context, userContext am.UserContext, etld str
 		Records:     convert.DomainToCTRecords(ctRecords),
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		_, retryErr := c.client.AddCT(ctxDeadline, in)
 		return errors.Wrap(retryErr, "unable to add ct records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return err
@@ -99,10 +101,83 @@ func (c *Client) DeleteCT(ctx context.Context, userContext am.UserContext, etld 
 		ETLD:        etld,
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		_, retryErr := c.client.DeleteCT(ctxDeadline, in)
 		return errors.Wrap(retryErr, "unable to delete ct records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) GetCTSubdomains(ctx context.Context, userContext am.UserContext, etld string) (time.Time, map[string]*am.CTSubdomain, error) {
+	var resp *service.GetCTSubdomainsResponse
+	var err error
+	var emptyTS time.Time
+
+	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
+	defer cancel()
+
+	in := &service.GetCTSubdomainsRequest{
+		UserContext: convert.DomainToUserContext(userContext),
+		ETLD:        etld,
+	}
+
+	err = retrier.RetryIfNot(func() error {
+		var retryErr error
+
+		resp, retryErr = c.client.GetCTSubdomains(ctxDeadline, in)
+
+		return errors.Wrap(retryErr, "unable to get ct records from client")
+	}, "rpc error: code = Unavailable desc")
+
+	if err != nil {
+		return emptyTS, nil, err
+	}
+	return time.Unix(0, resp.Time), convert.CTSubdomainRecordsToDomain(resp.Records), nil
+}
+
+func (c *Client) AddCTSubdomains(ctx context.Context, userContext am.UserContext, etld string, queryTime time.Time, subdomains map[string]*am.CTSubdomain) error {
+	var err error
+
+	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
+	defer cancel()
+
+	in := &service.AddCTSubdomainsRequest{
+		UserContext: convert.DomainToUserContext(userContext),
+		ETLD:        etld,
+		QueryTime:   queryTime.UnixNano(),
+		Records:     convert.DomainToCTSubdomainRecords(subdomains),
+	}
+
+	err = retrier.RetryIfNot(func() error {
+		_, retryErr := c.client.AddCTSubdomains(ctxDeadline, in)
+		return errors.Wrap(retryErr, "unable to add ct records from client")
+	}, "rpc error: code = Unavailable desc")
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) DeleteCTSubdomains(ctx context.Context, userContext am.UserContext, etld string) error {
+	var err error
+
+	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
+	defer cancel()
+
+	in := &service.DeleteCTSubdomainsRequest{
+		UserContext: convert.DomainToUserContext(userContext),
+		ETLD:        etld,
+	}
+
+	err = retrier.RetryIfNot(func() error {
+		_, retryErr := c.client.DeleteCTSubdomains(ctxDeadline, in)
+		return errors.Wrap(retryErr, "unable to delete ct records from client")
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return err

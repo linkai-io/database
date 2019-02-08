@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/bsm/grpclb"
 	"github.com/linkai-io/am/pkg/convert"
 	"github.com/linkai-io/am/pkg/retrier"
 	"github.com/pkg/errors"
@@ -12,10 +11,12 @@ import (
 	"github.com/linkai-io/am/am"
 	service "github.com/linkai-io/am/protocservices/webdata"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 )
 
 type Client struct {
 	client         service.WebDataClient
+	conn           *grpc.ClientConn
 	defaultTimeout time.Duration
 }
 
@@ -24,17 +25,18 @@ func New() *Client {
 }
 
 func (c *Client) Init(config []byte) error {
-	balancer := grpc.RoundRobin(grpclb.NewResolver(&grpclb.Options{
-		Address: string(config),
-	}))
-
-	conn, err := grpc.Dial(am.WebDataServiceKey, grpc.WithInsecure(), grpc.WithBalancer(balancer))
+	conn, err := grpc.DialContext(context.Background(), "srv://consul/"+am.WebDataServiceKey, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
 	if err != nil {
 		return err
 	}
 
+	c.conn = conn
 	c.client = service.NewWebDataClient(conn)
 	return nil
+}
+
+func (c *Client) SetTimeout(timeout time.Duration) {
+	c.defaultTimeout = timeout
 }
 
 func (c *Client) Add(ctx context.Context, userContext am.UserContext, webData *am.WebData) (int, error) {
@@ -49,13 +51,13 @@ func (c *Client) Add(ctx context.Context, userContext am.UserContext, webData *a
 		Data:        convert.DomainToWebData(webData),
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.Add(ctxDeadline, in)
 
 		return errors.Wrap(retryErr, "unable to get add records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, err
@@ -75,13 +77,13 @@ func (c *Client) GetResponses(ctx context.Context, userContext am.UserContext, f
 		Filter:      convert.DomainToWebResponseFilter(filter),
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.GetResponses(ctxDeadline, in)
 
 		return errors.Wrap(retryErr, "unable to get ct records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, nil, err
@@ -101,13 +103,13 @@ func (c *Client) GetCertificates(ctx context.Context, userContext am.UserContext
 		Filter:      convert.DomainToWebCertificateFilter(filter),
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.GetCertificates(ctxDeadline, in)
 
 		return errors.Wrap(retryErr, "unable to get ct records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, nil, err
@@ -128,13 +130,13 @@ func (c *Client) GetSnapshots(ctx context.Context, userContext am.UserContext, f
 		Filter:      convert.DomainToWebSnapshotFilter(filter),
 	}
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.GetSnapshots(ctxDeadline, in)
 
 		return errors.Wrap(retryErr, "unable to get ct records from client")
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return 0, nil, err

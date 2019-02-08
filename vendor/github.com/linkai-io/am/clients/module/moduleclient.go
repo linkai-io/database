@@ -6,23 +6,23 @@ import (
 	"errors"
 	"time"
 
-	"github.com/bsm/grpclb"
 	"github.com/linkai-io/am/am"
 	"github.com/linkai-io/am/pkg/convert"
 	"github.com/linkai-io/am/pkg/retrier"
 	service "github.com/linkai-io/am/protocservices/module"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 )
 
 type Config struct {
-	Addr       string
 	ModuleType am.ModuleType
 	Timeout    int
 }
 
 type Client struct {
 	client         service.ModuleClient
+	conn           *grpc.ClientConn
 	defaultTimeout time.Duration
 	config         *Config
 	key            string
@@ -43,31 +43,29 @@ func (c *Client) Init(data []byte) error {
 		c.defaultTimeout = (time.Second * time.Duration(c.config.Timeout))
 	}
 
-	balancer := grpc.RoundRobin(grpclb.NewResolver(&grpclb.Options{
-		Address: c.config.Addr,
-	}))
-
 	c.key = am.KeyFromModuleType(c.config.ModuleType)
 	if c.key == "" {
 		return errors.New("unknown module type passed to init")
 	}
 
-	conn, err := grpc.Dial(c.key, grpc.WithInsecure(), grpc.WithBalancer(balancer))
+	conn, err := grpc.DialContext(context.Background(), "srv://consul/"+c.key, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
 	if err != nil {
 		return err
 	}
+
+	c.conn = conn
 	c.client = service.NewModuleClient(conn)
 	return nil
+}
+
+func (c *Client) SetTimeout(timeout time.Duration) {
+	c.defaultTimeout = timeout
 }
 
 func (c *Client) parseConfig(data []byte) (*Config, error) {
 	config := &Config{}
 	if err := json.Unmarshal(data, config); err != nil {
 		return nil, err
-	}
-
-	if config.Addr == "" {
-		return nil, errors.New("module did not have Addr set")
 	}
 
 	return config, nil
@@ -84,7 +82,7 @@ func (c *Client) Analyze(ctx context.Context, userContext am.UserContext, addres
 	ctxDeadline, cancel := context.WithTimeout(context.Background(), c.defaultTimeout)
 	defer cancel()
 
-	err = retrier.Retry(func() error {
+	err = retrier.RetryIfNot(func() error {
 		var retryErr error
 
 		resp, retryErr = c.client.Analyze(ctxDeadline, in)
@@ -92,7 +90,7 @@ func (c *Client) Analyze(ctx context.Context, userContext am.UserContext, addres
 			log.Warn().Str("client", c.key).Err(retryErr).Msg("module analyze returned error")
 		}
 		return retryErr
-	})
+	}, "rpc error: code = Unavailable desc")
 
 	if err != nil {
 		return nil, nil, err

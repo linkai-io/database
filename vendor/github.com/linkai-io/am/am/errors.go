@@ -5,9 +5,10 @@ import "errors"
 var (
 	ErrEmptyDBConfig     = errors.New("empty database connection string")
 	ErrInvalidDBString   = errors.New("invalid db connection string")
-	ErrOrgIDMismatch     = errors.New("org id does not user context")
+	ErrOrgIDMismatch     = errors.New("org id does not match user context org id")
 	ErrUserNotAuthorized = errors.New("user is not authorized to perform this action")
 	ErrLimitTooLarge     = errors.New("requested number of records too large")
+	ErrNoResults         = errors.New("no results")
 
 	// Scan Group Specific
 	ErrScanGroupNotExists     = errors.New("scan group name does not exist")
@@ -17,7 +18,8 @@ var (
 	ErrEmptyAddress           = errors.New("address data was nil")
 
 	// Organization Specific
-	ErrOrganizationExists = errors.New("organization already exists")
+	ErrOrganizationExists    = errors.New("organization already exists")
+	ErrOrganizationNotExists = errors.New("organization does not exist")
 
 	// User Specific
 	ErrUserExists   = errors.New("user already exists")
