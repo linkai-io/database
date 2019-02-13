@@ -14,7 +14,7 @@ amm:
 
 all: pgm amm systemids
 
-pushamm: amm
+pushamm: 
 	docker tag am_migrations:latest 447064213022.dkr.ecr.us-east-1.amazonaws.com/am_migrations:latest && docker push 447064213022.dkr.ecr.us-east-1.amazonaws.com/am_migrations:latest
 
 pushecr:

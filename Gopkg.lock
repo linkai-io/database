@@ -43,7 +43,7 @@
   version = "v1.8.2"
 
 [[projects]]
-  digest = "1:2e22dd4e9ef0921e60bf32d7eb755e38cd6c9c2fb00dff79954b51d0aa242aa2"
+  digest = "1:5667dd52ae899715365f012dfe7c27e46a382132088d08c1d2ad021f839d40c3"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -80,8 +80,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "130e7e7f5cfa00e267b884bd2772ae986f9e8273"
-  version = "v1.16.30"
+  revision = "25f89dc67cc7eddac939028c7128499dcfcab46b"
+  version = "v1.16.33"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -226,7 +226,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:caefdbb1b4526eae065375f836bc766446b02bed11d48521b1039ad60d09af26"
+  digest = "1:ef03408dd91b1c72a635a3af2e2005f82bbfdbc359409bcd4e438fe42537b513"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -260,7 +260,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "eafcd25085d524c9216d8b567dbfd67b7578428d"
+  revision = "1ad53d3c0ba1315654dae723a9b204c1016aa8d5"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
@@ -402,11 +402,11 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "65e2d4e15006aab9813ff8769e768bbf4bb667a0"
+  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
 
 [[projects]]
   branch = "master"
-  digest = "1:511a6232760c10dcb1ebf1ab83ef0291e2baf801f203ca6314759c5458b73a6a"
+  digest = "1:1540fd815845f20e31cb95c3b6f7f0f0c8880c3d053845ba4a4a609539446bf6"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -416,15 +416,15 @@
     "jwt",
   ]
   pruneopts = "UT"
-  revision = "99b60b757ec124ebb7d6b7e97f153b19c10ce163"
+  revision = "3e8b2be1363542a95c52ea0796d4a40dacfb5b95"
 
 [[projects]]
   branch = "master"
-  digest = "1:969c44c96e9866e912a16e282a362cf045b64202107424983fe8abc3373d1eab"
+  digest = "1:8b466798e96432c23185ca32826702885299f94eb644c9a8dedb79771dff383a"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "41f3e6584952bb034a481797859f6ab34b6803bd"
+  revision = "3b5209105503162ded1863c307ac66fec31120dd"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
