@@ -15,7 +15,7 @@ grant select, insert, update, delete on am.web_certificates to webdataservice;
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
 revoke linkai_user from webdataservice;
-revoke usage in schema am from webdataservice;
+revoke usage on schema am from webdataservice;
 revoke usage, select on all sequences in schema am from webdataservice;
 revoke references (organization_id) on table am.organizations from webdataservice;
 revoke references (user_id) on table am.users from webdataservice;
