@@ -9,7 +9,7 @@ pgm:
 	docker build -t pg_migrations -f Dockerfile.pgm .
 
 amm:
-	dep ensure -update
+	#dep ensure -update
 	docker build -t am_migrations -f Dockerfile.amm .
 
 all: pgm amm systemids

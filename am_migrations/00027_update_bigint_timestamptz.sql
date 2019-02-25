@@ -70,7 +70,8 @@ CREATE TABLE am.scan_group_findings (
 
 -- scan_group_address:
 alter table only am.scan_group_addresses add column discovered_timestamptz timestamptz not null default '2018-05-30'; 
-update am.scan_group_addresses as sga set discovered_timestamptz=(select to_timestamp(sga.discovered_timestamp/1000000000) from am.scan_group_addresses as dt where dt.address_id=sga.address_id);
+update am.scan_group_addresses as sga set discovered_timestamptz=(
+    select to_timestamp(sga.discovered_timestamp/1000000000) from am.scan_group_addresses as dt where dt.address_id=sga.address_id);
 alter table only am.scan_group_addresses drop column discovered_timestamp;
 alter table only am.scan_group_addresses rename column discovered_timestamptz to discovered_timestamp;
 
