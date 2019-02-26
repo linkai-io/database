@@ -43,7 +43,7 @@
   version = "v1.8.2"
 
 [[projects]]
-  digest = "1:e7eb24a5c0250ff1fd2db4c2b671787042f9f2febe1846358868c1b59ec86b89"
+  digest = "1:a788c10a2ddda832e73709e4ad47a1990e5b78655276be1fe12331fe6fcebef5"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -80,8 +80,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "e71d307a067ee20dbda259de3fd73a86161c339c"
-  version = "v1.17.2"
+  revision = "b4d97e9cf75f3815bd694b8e0d6f9d81492c3586"
+  version = "v1.17.5"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -226,7 +226,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9ee0f38513442dec7468dd3571dda033cc1849035540dcfc7661206c04452c79"
+  digest = "1:46a759e1b97def61eb8a1114adff0263824a439b91058b03abde4ef5ba5bec37"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -260,7 +260,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "834f5e2bd603dc9d6f90c1b4d9cf0d1a86d38dc9"
+  revision = "ac206464bdc27601ba9ad4ef5226b98694fbf21d"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
@@ -389,7 +389,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9d2f08c64693fbe7177b5980f80c35672c80f12be79bb3bc86948b934d70e4ee"
+  digest = "1:5b51b81e299d0dfd03f567fd8d8a2d7ee954b3b72c69292f07c49aae785b6dd9"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -402,7 +402,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
+  revision = "fe579d43d83210096a79b46dcca0e3721058393a"
 
 [[projects]]
   branch = "master"
@@ -420,11 +420,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8207c052fb873f83c61a5aa16f6add5feb9881eda2112b56f69fd3b9e7f55c3f"
+  digest = "1:d0e9a312c4610a508569ab25e54d34600b1a96d19b1866ece104ffdf1c1b9d2c"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "b4e8571b14e03cc164df06f72b640ebce3899579"
+  revision = "cc5685c2db1239775905f3911f0067c0fa74762f"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
