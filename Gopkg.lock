@@ -260,7 +260,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "ac206464bdc27601ba9ad4ef5226b98694fbf21d"
+  revision = "6f52722c2e6e77010b84f6f830e69108bae85493"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"

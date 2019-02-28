@@ -1,0 +1,21 @@
+FROM golang:alpine as builder
+
+RUN apk update && apk add git && apk add ca-certificates
+
+RUN adduser -D -g '' appuser 
+
+COPY . $GOPATH/src/github.com/linkai-io/database
+WORKDIR $GOPATH/src/github.com/linkai-io/database
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-w -s' -o /go/bin/aggregates cmd/tasks/aggregates/main.go
+
+# STEP 2 build a small image
+# start from scratch
+FROM scratch
+# Copy our static executable and supporting
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /go/bin/aggregates /go/bin/aggregates 
+USER appuser 
+
+ENTRYPOINT ["/go/bin/aggregates"]
