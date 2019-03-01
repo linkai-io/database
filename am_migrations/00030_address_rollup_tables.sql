@@ -224,14 +224,14 @@ BEGIN
     IF start_id > end_id THEN RETURN; END IF;
 
     /* aggregate the seen updates divide the day by 3 hour intervals, merge results if the entry already exists */
-    INSERT INTO am.seen_1day (address_id, organization_id, scan_group_id, period_start, seen_count)
+    INSERT INTO am.seen_3hour (address_id, organization_id, scan_group_id, period_start, seen_count)
       SELECT address_id, organization_id, scan_group_id,  date_trunc('day', last_seen_timestamp) + date_part('hour', last_seen_timestamp)::int / 3 * interval '3 hour' as trihourly, count(*) AS seen_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
       AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, trihourly
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
-      SET seen_count = am.seen_1day.seen_count + EXCLUDED.seen_count;
+      SET seen_count = am.seen_3hour.seen_count + EXCLUDED.seen_count;
 END;
 $function$;
 -- +goose StatementEnd
@@ -277,14 +277,14 @@ BEGIN
     IF start_id > end_id THEN RETURN; END IF;
 
     /* aggregate the seen updates divide the day by 3 hour intervals, merge results if the entry already exists */
-    INSERT INTO am.scanned_1day (address_id, organization_id, scan_group_id, period_start, scanned_count)
+    INSERT INTO am.scanned_3hour (address_id, organization_id, scan_group_id, period_start, scanned_count)
       SELECT address_id, organization_id, scan_group_id,  date_trunc('day', last_scanned_timestamp) + date_part('hour', last_scanned_timestamp)::int / 3 * interval '3 hour' as trihourly, count(*) AS scanned_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
       AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, trihourly
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
-      SET scanned_count = am.scanned_1day.scanned_count + EXCLUDED.scanned_count;
+      SET scanned_count = am.scanned_3hour.scanned_count + EXCLUDED.scanned_count;
 END;
 $function$;
 -- +goose StatementEnd
