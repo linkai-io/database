@@ -149,6 +149,7 @@ BEGIN
       SELECT address_id, organization_id, scan_group_id, date_trunc('day', discovered_timestamp), count(*) AS discovered_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
+      AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, date_trunc('day', discovered_timestamp)
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
       SET discovered_count = am.discoveries_1day.discovered_count + EXCLUDED.discovered_count;
@@ -174,6 +175,7 @@ BEGIN
       SELECT address_id, organization_id, scan_group_id, date_trunc('day', discovered_timestamp) + date_part('hour', discovered_timestamp)::int / 3 * interval '3 hour' as trihourly, count(*) AS discovered_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
+      AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, trihourly
       ON CONFLICT (address_id, organization_id, scan_group_id, period_start) DO UPDATE
       SET discovered_count = am.discoveries_3hour.discovered_count + EXCLUDED.discovered_count;
@@ -200,6 +202,7 @@ BEGIN
       SELECT address_id, organization_id, scan_group_id, date_trunc('day', last_seen_timestamp), count(*) AS seen_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
+      AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, date_trunc('day', last_seen_timestamp)
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
       SET seen_count = am.seen_1day.seen_count + EXCLUDED.seen_count;
@@ -225,6 +228,7 @@ BEGIN
       SELECT address_id, organization_id, scan_group_id,  date_trunc('day', last_seen_timestamp) + date_part('hour', last_seen_timestamp)::int / 3 * interval '3 hour' as trihourly, count(*) AS seen_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
+      AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, trihourly
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
       SET seen_count = am.seen_1day.seen_count + EXCLUDED.seen_count;
@@ -251,6 +255,7 @@ BEGIN
       SELECT address_id, organization_id, scan_group_id, date_trunc('day', last_scanned_timestamp), count(*) AS scanned_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
+      AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, date_trunc('day', last_scanned_timestamp)
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
       SET scanned_count = am.scanned_1day.scanned_count + EXCLUDED.scanned_count;
@@ -276,6 +281,7 @@ BEGIN
       SELECT address_id, organization_id, scan_group_id,  date_trunc('day', last_scanned_timestamp) + date_part('hour', last_scanned_timestamp)::int / 3 * interval '3 hour' as trihourly, count(*) AS scanned_count
       FROM am.scan_group_addresses
       WHERE address_id BETWEEN start_id AND end_id
+      AND ignored=false
       GROUP BY address_id, organization_id, scan_group_id, trihourly
       ON CONFLICT (address_id, organization_id, scan_group_id,  period_start) DO UPDATE
       SET scanned_count = am.scanned_1day.scanned_count + EXCLUDED.scanned_count;
