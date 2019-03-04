@@ -35,15 +35,15 @@
   version = "1.0.2"
 
 [[projects]]
-  digest = "1:c85d9e2f6abcd9a7bd0f16d91be25c4a2dfb7c95e74cfe17608722b3afffa88a"
+  digest = "1:4d653e20ffcb2bceaf9e05ddb999ec20da29ca4a1072aa543d76295194ffea04"
   name = "github.com/aws/aws-lambda-go"
   packages = ["events"]
   pruneopts = "UT"
-  revision = "527f5d301d2993af078be6d0b63372786b3fc18f"
-  version = "v1.8.2"
+  revision = "c83699c938a36c6d111f9837be9295184efeeb2e"
+  version = "v1.9.0"
 
 [[projects]]
-  digest = "1:dfca6ea9d522491f4e7e25f941c117b4103c6bca7d3024c734c6195bfc9f0c95"
+  digest = "1:b73a7aedb0fed361e11e04c6c47eb767556a34f3871d8e14618abf5aad4c0035"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -80,8 +80,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "f63ecde3e92bac72832e9b860480b29792e6a924"
-  version = "v1.17.7"
+  revision = "f2bb620afb315242706942e6ca4c7d26ee5ed627"
+  version = "v1.17.9"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -260,7 +260,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "1440e8aee85ae53136da2364a19f3e4ad575b7cd"
+  revision = "ec9b3d529a5386b6662902343bcb82e6857cf9e7"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
@@ -402,7 +402,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "c95aed5357e77a4bf7d3955c46740000a17adee1"
+  revision = "16b79f2e4e95ea23b2bf9903c9809ff7b013ce85"
 
 [[projects]]
   branch = "master"
@@ -420,11 +420,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d0e9a312c4610a508569ab25e54d34600b1a96d19b1866ece104ffdf1c1b9d2c"
+  digest = "1:c9f8fb2843d2d3c6cb46a2ea1e55edd8df0e2830bb25e968749893ed32d5f9f1"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "92a0ff1e1e2f61773648454ec71ec0c0f1c700a2"
+  revision = "c2f5717e611cf8e89a852a41081355194d80c943"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
