@@ -43,7 +43,7 @@
   version = "v1.9.0"
 
 [[projects]]
-  digest = "1:b73a7aedb0fed361e11e04c6c47eb767556a34f3871d8e14618abf5aad4c0035"
+  digest = "1:ea3bc7dee17a0800ee01686f23644db3b2a55f04db589bd44f35c100e46bbe46"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -65,23 +65,28 @@
     "aws/session",
     "aws/signer/v4",
     "internal/ini",
+    "internal/s3err",
     "internal/sdkio",
     "internal/sdkrand",
     "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
+    "private/protocol/eventstream",
+    "private/protocol/eventstream/eventstreamapi",
     "private/protocol/json/jsonutil",
     "private/protocol/jsonrpc",
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
+    "service/s3",
     "service/ssm",
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "f2bb620afb315242706942e6ca4c7d26ee5ed627"
-  version = "v1.17.9"
+  revision = "6ff66bb2b8ac90ac25b1dbbf9806f09651630789"
+  version = "v1.17.12"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -90,6 +95,22 @@
   pruneopts = "UT"
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:fe1f5a8a2884a361b21421c8a07df5f1a66ce7171904235bad427659a42b0d70"
+  name = "github.com/gammazero/deque"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2afb3858e9c73b567e0e05ea79906f4e1138bd4e"
+
+[[projects]]
+  branch = "master"
+  digest = "1:56d108880235425ce767421db2ed706fd4a164cc1507a2e7ecd7b85e009b23d6"
+  name = "github.com/gammazero/workerpool"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "86a96b5d5d92a0b49e0b9f278ae4615090b6172d"
 
 [[projects]]
   digest = "1:bed9d72d596f94e65fff37f4d6c01398074a6bb1c3f3ceff963516bd01db6ff5"
@@ -141,12 +162,12 @@
   version = "v2.0.3"
 
 [[projects]]
-  digest = "1:1b9c99915ccf7df1e6085259ebf137a7b11fab87f47c382b3ec7a7ab51fbe2d8"
+  digest = "1:4f7056aee828c8187a4268efd9fa6445e378e66db39d8b05f851030613279787"
   name = "github.com/hashicorp/consul"
   packages = ["api"]
   pruneopts = "UT"
-  revision = "c97c712e96e0e53308054d5e1180289fe02dce38"
-  version = "v1.4.2"
+  revision = "567e41ff6b096a478333c804d5c18264050bc3f8"
+  version = "v1.4.3"
 
 [[projects]]
   digest = "1:f47d6109c2034cb16bd62b220e18afd5aa9d5a1630fe5d937ad96a4fb7cbb277"
@@ -226,7 +247,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e676d4253d60a630bd4331e4a7915efd4610e22166f978c40728c70efa710037"
+  digest = "1:d947de5cb17cb551ff2665acfb2c80d7c82f24b85c418ec6c69a912684c6976d"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -243,12 +264,15 @@
     "pkg/bq",
     "pkg/convert",
     "pkg/discovery",
+    "pkg/filestorage",
     "pkg/initializers",
+    "pkg/parsers",
     "pkg/redisclient",
     "pkg/retrier",
     "pkg/secrets",
     "pkg/state",
     "pkg/state/redis",
+    "pkg/webtech",
     "protocservices/address",
     "protocservices/bigdata",
     "protocservices/coordinator",
@@ -260,7 +284,15 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "ec9b3d529a5386b6662902343bcb82e6857cf9e7"
+  revision = "24fe83532927bab615a9be1a013b213b2f36f052"
+
+[[projects]]
+  digest = "1:1b46adc9e3d878cdf38a164cfdac2e19340f4d2662aa5bee88062f6ee08ac9df"
+  name = "github.com/miekg/dns"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8fc2e5773bbd308ca2fcc962fd8d25c1bd0f6743"
+  version = "v1.1.4"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
@@ -314,12 +346,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:d4c5d57ac0163eb71e09f1a94ca998961668700232f948d47a6269c8d7651d38"
+  digest = "1:7d99649602f68b73ade640ca6975ccc38735f329e159c6a507b63f00213678c0"
   name = "github.com/pressly/goose"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7a98874933001af28951c83e958b1db750f39f8d"
-  version = "v2.4.5"
+  revision = "e4b98955473e91a12fc7d8816c28d06376d1d92c"
+  version = "v2.6.0"
 
 [[projects]]
   digest = "1:418b49380dbaa8b8fb72740658acb74f176a056b9d041d4b761edbf770555c3d"
@@ -365,7 +397,7 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:785adacba41666eb1de74447b5538476b9a9da178bd7d15ba3aeb2879ed07ed3"
+  digest = "1:1af1920a0f0dc25426ba2e57154b9c091ec2ed83be9107abcf83d23c6c9a4194"
   name = "go.opencensus.io"
   packages = [
     ".",
@@ -384,21 +416,40 @@
     "trace/tracestate",
   ]
   pruneopts = "UT"
-  revision = "2b5032d79456124f42db6b7eb19ac6c155449dc2"
-  version = "v0.19.0"
+  revision = "f305e5c4e2cf345eba88de13d10de1126fa45a61"
+  version = "v0.19.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:5b51b81e299d0dfd03f567fd8d8a2d7ee954b3b72c69292f07c49aae785b6dd9"
+  digest = "1:d5891c5bca9c62e5d394ca26491d2b710a1dc08cedeb0ca8f9ac4c3305120b02"
+  name = "golang.org/x/crypto"
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+  ]
+  pruneopts = "UT"
+  revision = "8dd112bcdc25174059e45e07517d9fc663123347"
+
+[[projects]]
+  branch = "master"
+  digest = "1:7b8d9c88a1188054919b89df75ec4d7d974cf6914011ba2f8a373641bfd6ae20"
   name = "golang.org/x/net"
   packages = [
+    "bpf",
     "context",
     "context/ctxhttp",
+    "html",
+    "html/atom",
     "http/httpguts",
     "http2",
     "http2/hpack",
     "idna",
+    "internal/iana",
+    "internal/socket",
     "internal/timeseries",
+    "ipv4",
+    "ipv6",
+    "publicsuffix",
     "trace",
   ]
   pruneopts = "UT"
@@ -420,11 +471,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c9f8fb2843d2d3c6cb46a2ea1e55edd8df0e2830bb25e968749893ed32d5f9f1"
+  digest = "1:1fe78b1a9b9d1ca7ec9a48d680abb426b013c28e95a5f6ebb797b22f657071b7"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "c2f5717e611cf8e89a852a41081355194d80c943"
+  revision = "b294cbcfc56d2a65a30c02c78722b5df061e99b8"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -496,7 +547,7 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "4f5b463f9597cbe0dd13a6a2cd4f85e788d27508"
+  revision = "6e86cb5d2f12401bdd82a5eccbd701b5a697e63e"
 
 [[projects]]
   digest = "1:cbc746de4662c66fd24a037501bd65aa0f8ad0bfca0c92576e0abb88864e3741"
@@ -547,8 +598,10 @@
     "github.com/lib/pq",
     "github.com/linkai-io/am/am",
     "github.com/linkai-io/am/pkg/auth/ladonauth",
+    "github.com/linkai-io/am/pkg/filestorage",
     "github.com/linkai-io/am/pkg/initializers",
     "github.com/linkai-io/am/pkg/secrets",
+    "github.com/linkai-io/am/pkg/webtech",
     "github.com/ory/ladon",
     "github.com/pressly/goose",
     "github.com/rs/zerolog",

@@ -7,12 +7,20 @@ import (
 	"sync"
 )
 
+const VERSION = "v2.6.0"
+
 var (
 	duplicateCheckOnce sync.Once
 	minVersion         = int64(0)
 	maxVersion         = int64((1 << 63) - 1)
 	timestampFormat    = "20060102150405"
+	verbose            = false
 )
+
+// SetVerbose set the goose verbosity mode
+func SetVerbose(v bool) {
+	verbose = v
+}
 
 // Run runs a goose command.
 func Run(command string, db *sql.DB, dir string, args ...string) error {

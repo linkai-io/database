@@ -91,7 +91,6 @@ You can also create a Go migration, if you then invoke it with [your own goose b
 Apply all available migrations.
 
     $ goose up
-    $ goose: migrating db environment 'development', current version: 0, target: 3
     $ OK    001_basics.sql
     $ OK    002_next.sql
     $ OK    003_and_again.go
@@ -108,7 +107,6 @@ Migrate up to a specific version.
 Roll back a single migration from the current version.
 
     $ goose down
-    $ goose: migrating db environment 'development', current version: 3, target: 2
     $ OK    003_and_again.go
 
 ## down-to
@@ -123,9 +121,7 @@ Roll back migrations to a specific version.
 Roll back the most recently applied migration, then run it again.
 
     $ goose redo
-    $ goose: migrating db environment 'development', current version: 3, target: 2
     $ OK    003_and_again.go
-    $ goose: migrating db environment 'development', current version: 2, target: 3
     $ OK    003_and_again.go
 
 ## status
@@ -133,7 +129,6 @@ Roll back the most recently applied migration, then run it again.
 Print the status of all migrations:
 
     $ goose status
-    $ goose: status for environment 'development'
     $   Applied At                  Migration
     $   =======================================
     $   Sun Jan  6 11:25:03 2013 -- 001_basics.sql
@@ -245,6 +240,8 @@ func Down(tx *sql.Tx) error {
 ```
 
 # Hybrid Versioning
+Please, read the [versioning problem](https://github.com/pressly/goose/issues/63#issuecomment-428681694) first.
+
 We strongly recommend adopting a hybrid versioning approach, using both timestamps and sequential numbers. Migrations created during the development process are timestamped and sequential versions are ran on production. We believe this method will prevent the problem of conflicting versions when writing software in a team environment.
 
 To help you adopt this approach, `create` will use the current timestamp as the migration version. When you're ready to deploy your migrations in a production environment, we also provide a helpful `fix` command to convert your migrations into sequential order, while preserving the timestamp ordering. We recommend running `fix` in the CI pipeline, and only when the migrations are ready for production.
