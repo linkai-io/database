@@ -1,2 +1,4 @@
 cmd/amm/amm
 cmd/pgm/pgm
+cmd/tasks/aggregates/aggregates
+cmd/tasks/techupdate/techupdate
