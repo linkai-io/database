@@ -38,13 +38,21 @@ BEGIN
         return new; 
     end if;
 
+	-- same host we already have, but new record
+    if exists(select host_address from am.scan_group_addresses where 
+        organization_id=NEW.organization_id and scan_group_id=NEW.scan_group_id
+        and host_address=NEW.host_address and deleted=false and ignored=false) then 
+        return new;
+    end if;
+
     -- get limits first
     select limit_hosts_reached, limit_hosts into limit_reached, max_limit from am.organizations where organization_id=NEW.organization_id;
 	
     -- we reached the limit for this org, throw it in overflow
 	if limit_reached then
 		insert into am.scan_group_addresses_overflow (organization_id, scan_group_id, discovery_id, host_address) values 
-			(NEW.organization_id, NEW.scan_group_id, NEW.discovery_id, NEW.host_address);
+			(NEW.organization_id, NEW.scan_group_id, NEW.discovery_id, NEW.host_address)
+            on conflict (organization_id, scan_group_id, host_address) do nothing;
 		return NULL;
 	end if;
 	
@@ -60,7 +68,8 @@ BEGIN
 	if cnt >= max_limit then
 		update am.organizations set limit_hosts_reached=true where organization_id=NEW.organization_id;
 		insert into am.scan_group_addresses_overflow (organization_id, scan_group_id, discovery_id, host_address) values 
-			(NEW.organization_id, NEW.scan_group_id, NEW.discovery_id, NEW.host_address);
+			(NEW.organization_id, NEW.scan_group_id, NEW.discovery_id, NEW.host_address)
+            on conflict (organization_id, scan_group_id, host_address) do nothing;
 		return NULL;
 	end if;
 	-- or, we are good, no limits have been reached yet
