@@ -45,21 +45,25 @@ create table am.user_notification_settings (
     user_id int references am.users (user_id),
     weekly_report_send_day int not null default 0,
     daily_report_send_hour int not null default 0,
-    user_timezone varchar(128) not null default ''
+    user_timezone varchar(128) not null default '',
+    UNIQUE(organization_id,user_id)
 );
 
 create table am.user_notification_subscriptions (
     organization_id int references am.organizations (organization_id),
     user_id int references am.users (user_id),
     type_id int references am.event_notification_types (type_id),
-    subscribed_since timestamptz not null
+    subscribed_since timestamptz not null,
+    UNIQUE(organization_id, user_id, type_id)
 );
 
 create table am.user_notifications_read (
     organization_id int references am.organizations (organization_id),
     user_id int references am.users (user_id),
-    notification_id bigint references am.event_notifications (notification_id)
+    notification_id bigint references am.event_notifications (notification_id),
+    UNIQUE(organization_id,user_id,notification_id)
 );
+
 
 grant select on am.event_notification_types to eventservice;
 grant select, insert, update, delete on am.event_notifications to eventservice;
@@ -67,6 +71,13 @@ grant select, insert, update, delete on am.event_notifications_archive to events
 grant select, insert, update, delete on am.user_notification_settings to eventservice;
 grant select, insert, update, delete on am.user_notifications_read to eventservice;
 grant select, insert, update, delete on am.user_notification_subscriptions to eventservice;
+
+-- permissions for building reports
+grant select on am.web_certificates to eventservice;
+grant select on am.web_responses to eventservice;
+grant select on am.web_snapshots to eventservice;
+grant select on am.web_technologies to eventservice;
+grant select on am.scan_group_addresses to eventservice;
 
 -- +goose StatementBegin
 CREATE OR REPLACE FUNCTION am.delete_org(org_id integer) RETURNS void as 
@@ -123,6 +134,12 @@ BEGIN
 END
 $BODY$ LANGUAGE plpgsql SECURITY DEFINER;
 -- +goose StatementEnd
+
+revoke select on am.web_certificates from eventservice;
+revoke select on am.web_responses from eventservice;
+revoke select on am.web_snapshots from eventservice;
+revoke select on am.web_technologies from eventservice;
+revoke select on am.scan_group_addresses from eventservice;
 
 revoke select on am.event_notification_types from eventservice;
 revoke select, insert, update, delete on am.event_notifications from eventservice;
