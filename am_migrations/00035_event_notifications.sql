@@ -26,7 +26,7 @@ create table am.event_notifications (
     notification_id bigserial primary key not null,
     organization_id int references am.organizations (organization_id),
     scan_group_id int references am.scan_group (scan_group_id),
-    event_id int references am.event_notification_types (type_id),
+    type_id int references am.event_notification_types (type_id),
     event_timestamp timestamptz not null,
     event_data jsonb
 );
@@ -36,7 +36,7 @@ create table am.event_notifications_archive (
     organization_id int references am.organizations (organization_id),
     scan_group_id int references am.scan_group (scan_group_id),
     event_timestamp timestamptz not null,
-    event_id int references am.event_notification_types (type_id),
+    type_id int references am.event_notification_types (type_id),
     event_data jsonb
 );
 
@@ -46,6 +46,8 @@ create table am.user_notification_settings (
     weekly_report_send_day int not null default 0,
     daily_report_send_hour int not null default 0,
     user_timezone varchar(128) not null default '',
+    should_daily_email boolean default false,
+    should_weekly_email boolean default false,
     UNIQUE(organization_id,user_id)
 );
 
@@ -54,6 +56,7 @@ create table am.user_notification_subscriptions (
     user_id int references am.users (user_id),
     type_id int references am.event_notification_types (type_id),
     subscribed_since timestamptz not null,
+    subscribed boolean not null default false,
     UNIQUE(organization_id, user_id, type_id)
 );
 
