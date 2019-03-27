@@ -1,5 +1,8 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
+alter table ONLY am.web_snapshots 
+    add column requested_port int not null default 0;
+
 create table am.event_notification_types (
     type_id int primary key not null,
     notify_description text not null default ''
@@ -14,11 +17,8 @@ insert into am.event_notification_types (type_id, notify_description) values
     (101, 'website''s html updated'),
     (102, 'website''s technology changed'),
     (103, 'website''s javascript changed'),
-    (150, 'certificate expiring in 30 days'),
-    (151, 'certificate expiring in 15 days'),
-    (152, 'certificate expiring in 5 days'),
-    (153, 'certificate expiring in 1 day'),
-    (154, 'certificate expired'),
+    (150, 'certificate expiring'),
+    (151, 'certificate expired'),
     (200, 'dns server exposing records via zone transfer'),
     (201, 'dns server exposing records via NSEC walking');
 
@@ -32,7 +32,7 @@ create table am.event_notifications (
 );
 
 create table am.event_notifications_archive (
-    notification_id serial primary key not null,
+    notification_id bigserial primary key not null,
     organization_id int references am.organizations (organization_id),
     scan_group_id int references am.scan_group (scan_group_id),
     event_timestamp timestamptz not null,
@@ -157,3 +157,5 @@ drop table am.user_notification_settings;
 drop table am.event_notifications_archive;
 drop table am.event_notifications;
 drop table am.event_notification_types;
+
+alter table only am.web_snapshots drop column requested_port;
