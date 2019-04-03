@@ -1,5 +1,8 @@
 SERVICES = am_migrations pg_migrations db_systemids
 APP_ENV = dev
+mailreports:
+	docker build -t db_mailreports -f Dockerfile.db_mailreports .
+
 systemids:
 	docker build -t db_systemids -f Dockerfile.db_systemids .
 	
@@ -16,6 +19,9 @@ amm:
 	docker build -t am_migrations -f Dockerfile.amm .
 
 all: pgm amm systemids aggregates techupdate
+
+pushmailreports:
+	docker tag db_mailreports:latest 447064213022.dkr.ecr.us-east-1.amazonaws.com/db_mailreports:latest && docker push 447064213022.dkr.ecr.us-east-1.amazonaws.com/db_mailreports:latest
 
 pushamm: 
 	docker tag am_migrations:latest 447064213022.dkr.ecr.us-east-1.amazonaws.com/am_migrations:latest && docker push 447064213022.dkr.ecr.us-east-1.amazonaws.com/am_migrations:latest

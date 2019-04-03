@@ -15,8 +15,16 @@
     "internal/version",
   ]
   pruneopts = "UT"
-  revision = "2fa99f4c25c422525316dcb1fd3d5b94e1944cfd"
-  version = "v0.37.1"
+  revision = "458e1f376a2b44413160b5d301183b65debaa3f6"
+  version = "v0.37.2"
+
+[[projects]]
+  digest = "1:14a90eb1290bd0aa42848afa9ee2c9ce247abdb63c2cf614331670119760962f"
+  name = "github.com/Masterminds/squirrel"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "fa735ea14f09f8685fcf5e75db091feb5a410730"
+  version = "v1.1"
 
 [[projects]]
   branch = "master"
@@ -35,15 +43,15 @@
   version = "1.0.2"
 
 [[projects]]
-  digest = "1:4d653e20ffcb2bceaf9e05ddb999ec20da29ca4a1072aa543d76295194ffea04"
+  digest = "1:88c7b3cac28d066269e32daae492d47f9a955ba28570feb5cace0278f0dc3dca"
   name = "github.com/aws/aws-lambda-go"
   packages = ["events"]
   pruneopts = "UT"
-  revision = "c83699c938a36c6d111f9837be9295184efeeb2e"
-  version = "v1.9.0"
+  revision = "08d251dc58f204411d79012fd6f1beefb7107fea"
+  version = "v1.10.0"
 
 [[projects]]
-  digest = "1:d5cdfc5f0045c70db019604480c430c8e06c68bf04a65c8ad9909f44f13a2e87"
+  digest = "1:a3f51c6fac5053126f29debc36fba00817503a1b2380c0486d4bc62f92b4e91d"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -81,12 +89,13 @@
     "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
     "service/s3",
+    "service/ses",
     "service/ssm",
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "fcb19ead441f7659dd7d7589ff3fb0b45a24d863"
-  version = "v1.18.6"
+  revision = "97ab38e1626747eaa660ff7e5e7d3f1a37172b36"
+  version = "v1.19.9"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -162,12 +171,12 @@
   version = "v2.0.4"
 
 [[projects]]
-  digest = "1:4f7056aee828c8187a4268efd9fa6445e378e66db39d8b05f851030613279787"
+  digest = "1:9537873f2fc92467f451178506405fae087efc624d8d92644042209a03a2bfa0"
   name = "github.com/hashicorp/consul"
   packages = ["api"]
   pruneopts = "UT"
-  revision = "567e41ff6b096a478333c804d5c18264050bc3f8"
-  version = "v1.4.3"
+  revision = "ea5210a30e154f4da9a4c8e729b45b8ce7b9b92c"
+  version = "v1.4.4"
 
 [[projects]]
   digest = "1:af105c7c5dc0b4ae41991f122cae860b9600f7d226072c2a83127048c991660c"
@@ -235,6 +244,22 @@
   revision = "c2b33e84"
 
 [[projects]]
+  branch = "master"
+  digest = "1:a7fc52742a5d011497b6a24024c857d260f809083424cd84110c9e40c34f64fc"
+  name = "github.com/lann/builder"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "47ae307949d02aa1f1069fdafc00ca08e1dbabac"
+
+[[projects]]
+  branch = "master"
+  digest = "1:225499d25a9f1486f3b77cdc4f7d6590c506c3839bb9d8497113f6d19676d54a"
+  name = "github.com/lann/ps"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
+
+[[projects]]
   digest = "1:8ef506fc2bb9ced9b151dafa592d4046063d744c646c1bbe801982ce87e4bc24"
   name = "github.com/lib/pq"
   packages = [
@@ -246,8 +271,8 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:bfd3778750fe7ef264965616f612195df24a399d32e7f2308eb2aeddd2fa2b27"
+  branch = "notifications"
+  digest = "1:35e0133cc9985b3d8115e12cdf18587fa11d763acea8144042d1d0e3c9914aa9"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -255,10 +280,12 @@
     "clients/bigdata",
     "clients/coordinator",
     "clients/dispatcher",
+    "clients/event",
     "clients/module",
     "clients/organization",
     "clients/scangroup",
     "clients/webdata",
+    "mock",
     "pkg/auth",
     "pkg/auth/ladonauth",
     "pkg/bq",
@@ -266,6 +293,8 @@
     "pkg/discovery",
     "pkg/filestorage",
     "pkg/initializers",
+    "pkg/mail",
+    "pkg/mail/sesmailer",
     "pkg/parsers",
     "pkg/redisclient",
     "pkg/retrier",
@@ -277,6 +306,7 @@
     "protocservices/bigdata",
     "protocservices/coordinator",
     "protocservices/dispatcher",
+    "protocservices/event",
     "protocservices/module",
     "protocservices/organization",
     "protocservices/prototypes",
@@ -284,15 +314,15 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "eed7f840f176123719ca4b2bacf2095ff9dbd9b5"
+  revision = "8acdaada6eddf4149e093cb3fcaa8bead9303962"
 
 [[projects]]
-  digest = "1:4c195ae33dbe8df4eb3485f3357788f47b614547abcd048cbcc59d9025db6b8d"
+  digest = "1:2b4b4b2e5544c2a11a486c1b631357aa2ddf766e50c1b2483cf809da2c511234"
   name = "github.com/miekg/dns"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cc8cd02140663157ce797c6650488d6c8563f31f"
-  version = "v1.1.6"
+  revision = "73601d4aed9d844322611759d7f3619110b7c88e"
+  version = "v1.1.8"
 
 [[projects]]
   digest = "1:5d231480e1c64a726869bc4142d270184c419749d34f167646baa21008eb0a79"
@@ -389,15 +419,17 @@
   version = "v1.0.5"
 
 [[projects]]
-  digest = "1:1af1920a0f0dc25426ba2e57154b9c091ec2ed83be9107abcf83d23c6c9a4194"
+  digest = "1:b7ef726b2ea58476971d3aef8364568ea34ed2c3b11c929572a27d6d2ab639d3"
   name = "go.opencensus.io"
   packages = [
     ".",
-    "exemplar",
     "internal",
     "internal/tagencoding",
+    "metric/metricdata",
+    "metric/metricproducer",
     "plugin/ochttp",
     "plugin/ochttp/propagation/b3",
+    "resource",
     "stats",
     "stats/internal",
     "stats/view",
@@ -408,8 +440,8 @@
     "trace/tracestate",
   ]
   pruneopts = "UT"
-  revision = "f305e5c4e2cf345eba88de13d10de1126fa45a61"
-  version = "v0.19.1"
+  revision = "46618d076d80f4eab85adbcb3be9a370be1dc4e0"
+  version = "v0.20.0"
 
 [[projects]]
   branch = "master"
@@ -420,11 +452,11 @@
     "ed25519/internal/edwards25519",
   ]
   pruneopts = "UT"
-  revision = "b7391e95e576cacdcdd422573063bc057239113d"
+  revision = "8e1b8d32e692162a446e97250c5d34f5a52efed6"
 
 [[projects]]
   branch = "master"
-  digest = "1:79761ff3dabe447009396c3910a0647139cafa0544568b68e8d7d84852a12e09"
+  digest = "1:2af61482158f961af2edf3bc6c7b6ad38a4cd2dbe8d956f8f8b1efc711ffbd52"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -445,11 +477,11 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "1272bf9dcd53ea65c09668fb4c76e65deb740072"
+  revision = "b630fd6fe46bcfc98f989005d8b8ec1400e60a6e"
 
 [[projects]]
   branch = "master"
-  digest = "1:399cbecda4e8ab20451d68a1db3812c99791ed95c53c6e9d64f3594a7e608f51"
+  digest = "1:645cb780e4f3177111b40588f0a7f5950efcfb473e7ff41d8d81b2ba5eaa6ed5"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -459,15 +491,15 @@
     "jwt",
   ]
   pruneopts = "UT"
-  revision = "c85d3e98c914e3a33234ad863dcbff5dbc425bb8"
+  revision = "9f3314589c9a9136388751d9adae6b0ed400978a"
 
 [[projects]]
   branch = "master"
-  digest = "1:5637b3b43405643229e55140bb3049dfa7d73957ba9ecfccc31cdadbfbe0b1f9"
+  digest = "1:e18c1645adfe83d66f80d3676040e478895669f9456ca8bafa6a7290656c1b48"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "6c81ef8f67ca3f42fc9cd71dfbd5f35b0c4b5771"
+  revision = "81d4e9dc473e5e8c933f2aaeba2a3d81efb9aed2"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -493,7 +525,7 @@
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:4f4f798798e936e6083e617a30d3204ad1dcafc4561df60e2aae959971f8e23a"
+  digest = "1:075b5a1b4a6ce96ba06545e24d808762d94b8837f35ba7905c2356ae70a926aa"
   name = "google.golang.org/api"
   packages = [
     "bigquery/v2",
@@ -508,8 +540,8 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "e742f5a8defa1f9f5d723dfa04c962e680dc33f0"
-  version = "v0.2.0"
+  revision = "bce707a4d0ea3488942724b3bcc1c8338f38f991"
+  version = "v0.3.0"
 
 [[projects]]
   digest = "1:04f2ff15fc59e1ddaf9900ad0e19e5b19586b31f9dafd4d592b617642b239d8f"
@@ -539,7 +571,7 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "5fe7a883aa19554f42890211544aa549836af7b7"
+  revision = "f467c93bbac2133ff463e1f93d18d8f9f3f04451"
 
 [[projects]]
   digest = "1:c00eb80d7b152379c3e94c38d82b29deca98b1d0f53e4e20362589b7fcbffa07"
@@ -585,13 +617,17 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Masterminds/squirrel",
     "github.com/gofrs/uuid",
     "github.com/jackc/pgx",
     "github.com/lib/pq",
     "github.com/linkai-io/am/am",
+    "github.com/linkai-io/am/mock",
     "github.com/linkai-io/am/pkg/auth/ladonauth",
     "github.com/linkai-io/am/pkg/filestorage",
     "github.com/linkai-io/am/pkg/initializers",
+    "github.com/linkai-io/am/pkg/mail",
+    "github.com/linkai-io/am/pkg/mail/sesmailer",
     "github.com/linkai-io/am/pkg/secrets",
     "github.com/linkai-io/am/pkg/webtech",
     "github.com/ory/ladon",
