@@ -20,7 +20,7 @@ func init() {
 	appConfig.ServiceKey = "linkai_admin"
 }
 
-// main starts the CoordinatorService
+// main starts the SystemIDs task
 func main() {
 	var err error
 	var orgID int
