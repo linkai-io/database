@@ -38,7 +38,7 @@
   version = "1.0.0"
 
 [[constraint]]
-  branch = "notifications"
+  branch = "master"
   name = "github.com/linkai-io/am"
 
 [[constraint]]
