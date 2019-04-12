@@ -17,7 +17,7 @@ var (
 )
 
 func TestGenerateReports(t *testing.T) {
-	t.Skip("you must populate the database before running this test")
+	//t.Skip("you must populate the database before running this test")
 	appConfig.Env = os.Getenv("APP_ENV")
 	appConfig.Region = os.Getenv("APP_REGION")
 	appConfig.SelfRegister = os.Getenv("APP_SELF_REGISTER")

@@ -18,7 +18,7 @@ techupdate:
 amm:
 	docker build -t am_migrations -f Dockerfile.amm .
 
-all: pgm amm systemids aggregates techupdate
+all: pgm amm systemids aggregates techupdate mailreports
 
 pushmailreports:
 	docker tag db_mailreports:latest 447064213022.dkr.ecr.us-east-1.amazonaws.com/db_mailreports:latest && docker push 447064213022.dkr.ecr.us-east-1.amazonaws.com/db_mailreports:latest

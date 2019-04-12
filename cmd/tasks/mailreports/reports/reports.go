@@ -2,6 +2,7 @@ package reports
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"time"
@@ -97,14 +98,38 @@ func GetReportEvents(mailer mail.Mailer, pool *pgx.ConnPool, rows *pgx.Rows, rep
 	defer rows.Close()
 
 	for rows.Next() {
+		var orgID int
+		var userID int
 		var sgName string
 		var typeID int32
 		var data []string
 		var ts time.Time
+		var shouldEmailWeekly bool
+		var shouldEmailDaily bool
 
-		if err := rows.Scan(&sgName, &typeID, &ts, &report.UserTimeZone, &data); err != nil {
+		if err := rows.Scan(&orgID, &sgName, &userID, &typeID, &ts, &data, &report.UserTimeZone, &shouldEmailWeekly, &shouldEmailDaily); err != nil {
 			log.Warn().Err(err).Msg("failed to read event data")
 			continue
+		}
+
+		if report.UserID != userID {
+			log.Error().Msg("user id did not match")
+			return errors.New("user id did not match from events")
+		}
+
+		if report.OrgID != orgID {
+			log.Error().Msg("org id did not match")
+			return errors.New("org id did not match from events")
+		}
+
+		if report.ReportType == "weekly" && shouldEmailWeekly == false {
+			log.Info().Str("Org", report.OrganizationName).Int("User", report.UserID).Msg("user not subscribed for weekly emails")
+			return nil
+		}
+
+		if report.ReportType == "daily" && shouldEmailDaily == false {
+			log.Info().Str("Org", report.OrganizationName).Int("User", report.UserID).Msg("user not subscribed for daily emails")
+			return nil
 		}
 
 		if _, ok := report.GroupReports[sgName]; !ok {

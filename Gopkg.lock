@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:75ec87c61601521645db82e3e200e3ff297f01fa71b959c85a48c97f58cbddb1"
+  digest = "1:e2785d9dc421e1adb6011ac011acdc4d68ac221123baa69c55d023f90d6924af"
   name = "cloud.google.com/go"
   packages = [
     "bigquery",
@@ -15,8 +15,8 @@
     "internal/version",
   ]
   pruneopts = "UT"
-  revision = "458e1f376a2b44413160b5d301183b65debaa3f6"
-  version = "v0.37.2"
+  revision = "fcb9a2d5f791d07be64506ab54434de65989d370"
+  version = "v0.37.4"
 
 [[projects]]
   digest = "1:14a90eb1290bd0aa42848afa9ee2c9ce247abdb63c2cf614331670119760962f"
@@ -51,7 +51,7 @@
   version = "v1.10.0"
 
 [[projects]]
-  digest = "1:a3f51c6fac5053126f29debc36fba00817503a1b2380c0486d4bc62f92b4e91d"
+  digest = "1:4cce717a34fe2bce5f8a9dc73ad4e8befc8ec127ee8c3a6c7de55723f27b35ac"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -94,8 +94,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "97ab38e1626747eaa660ff7e5e7d3f1a37172b36"
-  version = "v1.19.9"
+  revision = "56c1def75689cceec1fa6f14c2eedb4b798827f9"
+  version = "v1.19.11"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -119,7 +119,7 @@
   name = "github.com/gammazero/workerpool"
   packages = ["."]
   pruneopts = "UT"
-  revision = "86a96b5d5d92a0b49e0b9f278ae4615090b6172d"
+  revision = "88d534f22b564446dfea98776bf4ba1c1820b526"
 
 [[projects]]
   digest = "1:bed9d72d596f94e65fff37f4d6c01398074a6bb1c3f3ceff963516bd01db6ff5"
@@ -271,8 +271,8 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "notifications"
-  digest = "1:35e0133cc9985b3d8115e12cdf18587fa11d763acea8144042d1d0e3c9914aa9"
+  branch = "master"
+  digest = "1:48b0aafbe81f2dd40931eac7057cfb5a567598ab485ed9e2c08ac74c03826cbd"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -314,7 +314,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "8acdaada6eddf4149e093cb3fcaa8bead9303962"
+  revision = "555133a7b7d707b66f15a5766c1ac79aeac902cb"
 
 [[projects]]
   digest = "1:2b4b4b2e5544c2a11a486c1b631357aa2ddf766e50c1b2483cf809da2c511234"
@@ -419,7 +419,7 @@
   version = "v1.0.5"
 
 [[projects]]
-  digest = "1:b7ef726b2ea58476971d3aef8364568ea34ed2c3b11c929572a27d6d2ab639d3"
+  digest = "1:ce72568389d111aa2d94b2d6b3c0213ab4699a05cbc6e203ed578f379bedef8f"
   name = "go.opencensus.io"
   packages = [
     ".",
@@ -440,8 +440,8 @@
     "trace/tracestate",
   ]
   pruneopts = "UT"
-  revision = "46618d076d80f4eab85adbcb3be9a370be1dc4e0"
-  version = "v0.20.0"
+  revision = "75c0cca22312e51bfd4fafdbe9197ae399e18b38"
+  version = "v0.20.2"
 
 [[projects]]
   branch = "master"
@@ -452,7 +452,7 @@
     "ed25519/internal/edwards25519",
   ]
   pruneopts = "UT"
-  revision = "8e1b8d32e692162a446e97250c5d34f5a52efed6"
+  revision = "38d8ce5564a5b71b2e3a00553993f1b9a7ae852f"
 
 [[projects]]
   branch = "master"
@@ -477,7 +477,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "b630fd6fe46bcfc98f989005d8b8ec1400e60a6e"
+  revision = "eb5bcb51f2a31c7d5141d810b70815c05d9c9146"
 
 [[projects]]
   branch = "master"
@@ -495,11 +495,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e18c1645adfe83d66f80d3676040e478895669f9456ca8bafa6a7290656c1b48"
+  digest = "1:cf353a5a9ffb2d6f850e9c773e25388a425a70c270546480427ed069e87b136a"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "81d4e9dc473e5e8c933f2aaeba2a3d81efb9aed2"
+  revision = "4b34438f7a67ee5f45cc6132e2bad873a20324e9"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -525,7 +525,7 @@
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:075b5a1b4a6ce96ba06545e24d808762d94b8837f35ba7905c2356ae70a926aa"
+  digest = "1:d238aee1606527815926ec20ca1fa3d1b31589c45119f4783cb8976ba65f1259"
   name = "google.golang.org/api"
   packages = [
     "bigquery/v2",
@@ -540,8 +540,8 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "bce707a4d0ea3488942724b3bcc1c8338f38f991"
-  version = "v0.3.0"
+  revision = "0cbcb99a9ea0c8023c794b2693cbe1def82ed4d7"
+  version = "v0.3.2"
 
 [[projects]]
   digest = "1:04f2ff15fc59e1ddaf9900ad0e19e5b19586b31f9dafd4d592b617642b239d8f"
@@ -571,10 +571,10 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "f467c93bbac2133ff463e1f93d18d8f9f3f04451"
+  revision = "64821d5d210748c883cd2b809589555ae4654203"
 
 [[projects]]
-  digest = "1:c00eb80d7b152379c3e94c38d82b29deca98b1d0f53e4e20362589b7fcbffa07"
+  digest = "1:31d87f39886fb38a2b6c097ff3b9f985d6960772170d64a68246f7790e955746"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -591,6 +591,7 @@
     "grpclog",
     "internal",
     "internal/backoff",
+    "internal/balancerload",
     "internal/binarylog",
     "internal/channelz",
     "internal/envconfig",
@@ -610,8 +611,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "3507fb8e1a5ad030303c106fef3a47c9fdad16ad"
-  version = "v1.19.1"
+  revision = "236199dd5f8031d698fb64091194aecd1c3895b2"
+  version = "v1.20.0"
 
 [solve-meta]
   analyzer-name = "dep"
