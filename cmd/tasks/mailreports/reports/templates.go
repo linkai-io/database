@@ -10,12 +10,12 @@ import (
 )
 
 const reportHTMLTemplate = `<p> Hello {{ .FirstName }} {{ .LastName}},</p>
-{{ if .GroupReports }}
+{{ if .GroupReports.GroupData }}
 <p>The following are a collection of events between {{ time .Since .UserTimeZone }} - {{ time .Now .UserTimeZone}}</p>
 <br>
-  {{ range $sg, $types := .GroupReports }} 
-  <h3>Group: {{ $sg }}</h3>
-		{{ range $type_id, $events := $types}}
+  {{ range $groupID, $groups := .GroupReports.GroupData }} 
+  <h3>Group: {{ $groups.Name }}</h3>
+		{{ range $type_id, $events := $groups.Events}}
 		{{ event $type_id $events}}
 		{{ end }}
   {{ end }}
@@ -34,7 +34,7 @@ func TimePrinter(t time.Time, timeZone string) string {
 	return t.Format(time.UnixDate)
 }
 
-func EventPrinter(typeID int32, events []*ScanGroupReport) string {
+func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 	var buf bytes.Buffer
 
 	switch typeID {
@@ -53,44 +53,40 @@ func EventPrinter(typeID int32, events []*ScanGroupReport) string {
 	case am.EventMaxHostPricing:
 	case am.EventNewHost:
 		buf.WriteString("The following new hosts were found:")
-
+		buf.WriteString("\n<ul>")
 		for _, e := range events {
-			buf.WriteString("<br>\n<ul>")
 			for _, host := range e.Data {
 				buf.WriteString("\n\t<li>" + host + "</li>\n")
 			}
-			buf.WriteString("</ul>")
 		}
+		buf.WriteString("</ul>")
 	case am.EventAXFR:
 		buf.WriteString("The following name servers were found leaking hostnames via Zone Transfer")
-
+		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			buf.WriteString("<br>\n<ul>")
 			for _, nsServer := range e.Data {
 				buf.WriteString("\n\t<li>" + nsServer + "</li>\n")
 			}
-			buf.WriteString("</ul>")
 		}
+		buf.WriteString("</ul>")
 	case am.EventNSEC:
 		buf.WriteString("The following name servers are leaking hostnames via NSEC records")
-
+		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			buf.WriteString("<br>\n<ul>")
 			for _, nsServer := range e.Data {
 				buf.WriteString("\n\t<li>" + nsServer + "</li>\n")
 			}
-			buf.WriteString("</ul>")
 		}
+		buf.WriteString("</ul>")
 	case am.EventNewWebsite:
 		buf.WriteString("The following new web sites were found:")
-
+		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			buf.WriteString("<br>\n<ul>")
 			for i := 0; i < len(e.Data); i += 2 {
 				buf.WriteString(fmt.Sprintf("\n\t<li><a href=\"%s\">%s</a> on port %s</li>\n", e.Data[i], e.Data[i], e.Data[i+1]))
 			}
-			buf.WriteString("</ul>")
 		}
+		buf.WriteString("</ul>")
 	case am.EventWebHTMLUpdated:
 	case am.EventWebJSChanged:
 	case am.EventWebTechChanged:

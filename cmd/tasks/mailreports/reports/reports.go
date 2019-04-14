@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"html/template"
+	"text/template"
 	"time"
 
 	"github.com/jackc/pgx"
@@ -29,22 +29,19 @@ func init() {
 }
 
 type Report struct {
-	OrgID            int
-	UserID           int
-	UserTimeZone     string
-	ReportType       string
-	OrganizationName string
-	FirstName        string
-	LastName         string
-	Email            string
-	GroupReports     map[string]map[int32][]*ScanGroupReport // sg name (key), map (type_id) key
-	Since            time.Time
-	Now              time.Time
-}
-
-type ScanGroupReport struct {
-	Timestamp time.Time
-	Data      []string
+	OrgID             int
+	UserID            int
+	UserTimeZone      string
+	ReportType        string
+	OrganizationName  string
+	FirstName         string
+	LastName          string
+	Email             string
+	ShouldWeeklyEmail bool
+	ShouldDailyEmail  bool
+	GroupReports      *ScanGroupReport // sg name (key), map (type_id) key
+	Since             time.Time
+	Now               time.Time
 }
 
 func GenerateReports(appConfig initializers.AppConfig, weekly bool, mailer mail.Mailer) {
@@ -52,9 +49,33 @@ func GenerateReports(appConfig initializers.AppConfig, weekly bool, mailer mail.
 
 	_, pool := initializers.DB(&appConfig)
 
-	query := `select org.organization_id, org.organization_name, u.user_id, u.first_name, u.last_name, u.email from am.users as u 
-		join am.organizations as org on org.organization_id=u.organization_id 
-		where org.deleted=false and u.deleted=false	and status_id=1000 and subscription_id<>9999`
+	activeQuery := `select sga.organization_id,sga.scan_group_id from am.scan_group as sg 
+		join am.scan_group_addresses as sga on sga.scan_group_id=sg.scan_group_id 
+		where sga.deleted=false group by sga.organization_id,sga.scan_group_id`
+
+	activeGroups := make(map[int][]int)
+	activeRows, err := pool.Query(activeQuery)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to get list of active groups")
+	}
+	defer activeRows.Close()
+
+	for activeRows.Next() {
+		var orgID int
+		var groupID int
+		if err := activeRows.Scan(&orgID, &groupID); err != nil {
+			log.Fatal().Err(err).Msg("failed to read group")
+		}
+		if _, ok := activeGroups[orgID]; !ok {
+			activeGroups[orgID] = make([]int, 0)
+		}
+		activeGroups[orgID] = append(activeGroups[orgID], groupID)
+	}
+
+	// only return orgs/users that are actually subscribed to receive emails
+	query := `select org.organization_id, org.organization_name, u.user_id, u.first_name, u.last_name, u.email, uns.user_timezone, uns.should_weekly_email, uns.should_daily_email from am.users as u 
+	join am.organizations as org on org.organization_id=u.organization_id 
+	join am.user_notification_settings as uns on u.user_id=uns.user_id where org.deleted=false and u.deleted=false and status_id=1000 and subscription_id<>9999`
 
 	rows, err := pool.Query(query)
 	if err != nil {
@@ -72,25 +93,49 @@ func GenerateReports(appConfig initializers.AppConfig, weekly bool, mailer mail.
 		if weekly {
 			report.ReportType = "weekly"
 		}
-		if err := rows.Scan(&report.OrgID, &report.OrganizationName, &report.UserID, &report.FirstName, &report.LastName, &report.Email); err != nil {
+
+		if err := rows.Scan(&report.OrgID, &report.OrganizationName, &report.UserID,
+			&report.FirstName, &report.LastName, &report.Email, &report.UserTimeZone,
+			&report.ShouldWeeklyEmail, &report.ShouldDailyEmail); err != nil {
 			log.Warn().Err(err).Msg("unable to get oid/uid, continuing")
 			continue
 		}
 
-		query, args, err := buildGetReportQuery(report.OrgID, report.UserID, weekly, report.Since)
+		if _, ok := activeGroups[report.OrgID]; !ok {
+			log.Info().Int("OrgID", report.OrgID).Msg("this org has no groups, skipping")
+			continue
+		}
+
+		if report.ReportType == "weekly" && report.ShouldWeeklyEmail == false {
+			log.Info().Str("Org", report.OrganizationName).Int("User", report.UserID).Msg("user not subscribed for weekly emails")
+			continue
+		}
+
+		if report.ReportType == "daily" && report.ShouldDailyEmail == false {
+			log.Info().Str("Org", report.OrganizationName).Int("User", report.UserID).Msg("user not subscribed for daily emails")
+			continue
+		}
+
+		query, args, err := buildGetReportQuery(report.OrgID, report.UserID, report.Since)
 		if err != nil {
 			log.Fatal().Err(err).Int("OrgID", report.OrgID).Int("UserID", report.UserID).Str("query", query).Msg("something wrong with report query")
 		}
+		log.Info().Int("OrgID", report.OrgID).Int("UserID", report.UserID).Str("query", query).Msgf("query args %#v", args)
 
-		report.GroupReports = make(map[string]map[int32][]*ScanGroupReport)
+		report.GroupReports = NewScanGroupReport()
 		eventRows, err := pool.Query(query, args...)
 		if err != nil {
 			log.Warn().Err(err).Int("OrgID", report.OrgID).Int("UserID", report.UserID).Str("query", query).Msg("failed to query events")
 			continue
 		}
-		if err := GetReportEvents(mailer, pool, eventRows, report); err != nil {
-			log.Warn().Err(err).Int("OrgID", report.OrgID).Int("UserID", report.UserID).Msg("error generating/sending report")
+
+		if err = GetReportEvents(mailer, pool, eventRows, report); err != nil {
+			log.Warn().Err(err).Int("OrgID", report.OrgID).Int("UserID", report.UserID).Msg("error generating report")
+			continue
 		}
+
+		report.Now = time.Now()
+		SendReport(mailer, report)
 	}
 }
 
@@ -100,14 +145,13 @@ func GetReportEvents(mailer mail.Mailer, pool *pgx.ConnPool, rows *pgx.Rows, rep
 	for rows.Next() {
 		var orgID int
 		var userID int
+		var groupID int
 		var sgName string
 		var typeID int32
 		var data []string
 		var ts time.Time
-		var shouldEmailWeekly bool
-		var shouldEmailDaily bool
 
-		if err := rows.Scan(&orgID, &sgName, &userID, &typeID, &ts, &data, &report.UserTimeZone, &shouldEmailWeekly, &shouldEmailDaily); err != nil {
+		if err := rows.Scan(&orgID, &groupID, &sgName, &userID, &typeID, &ts, &data); err != nil {
 			log.Warn().Err(err).Msg("failed to read event data")
 			continue
 		}
@@ -122,81 +166,61 @@ func GetReportEvents(mailer mail.Mailer, pool *pgx.ConnPool, rows *pgx.Rows, rep
 			return errors.New("org id did not match from events")
 		}
 
-		if report.ReportType == "weekly" && shouldEmailWeekly == false {
-			log.Info().Str("Org", report.OrganizationName).Int("User", report.UserID).Msg("user not subscribed for weekly emails")
-			return nil
-		}
-
-		if report.ReportType == "daily" && shouldEmailDaily == false {
-			log.Info().Str("Org", report.OrganizationName).Int("User", report.UserID).Msg("user not subscribed for daily emails")
-			return nil
-		}
-
-		if _, ok := report.GroupReports[sgName]; !ok {
-			report.GroupReports[sgName] = make(map[int32][]*ScanGroupReport)
-		}
-
-		if _, ok := report.GroupReports[sgName][typeID]; !ok {
-			report.GroupReports[sgName][typeID] = make([]*ScanGroupReport, 0)
-		}
-
-		// for certificates, there's the chance it already expired, so we should just grab it directly from DB instead of events
+		// for certificates, there's the chance it already expired, so skip this and we'll check all after
 		if typeID == am.EventCertExpiring {
-			evt, err := CheckCertificates(pool, sgName, report)
-			if err != nil {
-				log.Warn().Err(err).Msg("failed to get certificates")
-				continue
-			}
-
-			if evt == nil || len(evt) == 0 {
-				continue
-			}
-			report.GroupReports[sgName][typeID] = append(report.GroupReports[sgName][typeID], &ScanGroupReport{Timestamp: time.Now(), Data: evt})
 			continue
 		}
-		report.GroupReports[sgName][typeID] = append(report.GroupReports[sgName][typeID], &ScanGroupReport{Timestamp: ts, Data: data})
+		report.GroupReports.Add(groupID, sgName, typeID, &ScanGroupReportEvent{Timestamp: ts, Data: data})
 	}
-	report.Now = time.Now()
-	return SendReport(mailer, report)
+
+	if err := CheckCertificates(pool, report); err != nil {
+		log.Warn().Err(err).Msg("failed to get certificates")
+	}
+	return nil
 }
 
-func CheckCertificates(pool *pgx.ConnPool, sgName string, report *Report) ([]string, error) {
-	rows, err := pool.Query(`select subject_name, port, valid_to from am.web_certificates 
+func CheckCertificates(pool *pgx.ConnPool, report *Report) error {
+	for groupID, groupReport := range report.GroupReports.GroupData {
+		// our list of scan_group_id's for this org is already filtered on 'non-deleted' groups.
+		rows, err := pool.Query(`select subject_name, port, valid_to from am.web_certificates 
 		where (TIMESTAMPTZ 'epoch' + valid_to * '1 second'::interval) 
 		between now() and now() + interval '30 days'
-		and organization_id=$1
-		and scan_group_id=(select scan_group_id from am.scan_group where scan_group_name=$2)`, report.OrgID, sgName)
-	if err != nil {
-		return nil, err
-	}
-	certs := make([]string, 0)
-	for i := 0; rows.Next(); i++ {
-		var subjectName string
-		var port int
-		var validTo int64
-		if err := rows.Scan(&subjectName, &port, &validTo); err != nil {
-			log.Error().Err(err).Msg("failed to scan certificate expired event")
-			continue
+		and organization_id=$1 and scan_group_id=$2
+		`, report.OrgID, groupID)
+		if err != nil {
+			return err
 		}
-		validTime := time.Unix(validTo, 0)
-		ts := validTime.Sub(time.Now()).Hours()
-		expires := ""
-		if ts <= float64(24) {
-			expires = fmt.Sprintf("%.01f hours", ts)
-		} else {
-			expires = fmt.Sprintf("%.0f days", ts/float64(24))
+		certs := make([]string, 0)
+		for i := 0; rows.Next(); i++ {
+			var subjectName string
+			var port int
+			var validTo int64
+			if err := rows.Scan(&subjectName, &port, &validTo); err != nil {
+				log.Error().Err(err).Msg("failed to scan certificate expired event")
+				continue
+			}
+			validTime := time.Unix(validTo, 0)
+			ts := validTime.Sub(time.Now()).Hours()
+			expires := ""
+			if ts <= float64(24) {
+				expires = fmt.Sprintf("%.01f hours", ts)
+			} else {
+				expires = fmt.Sprintf("%.0f days", ts/float64(24))
+			}
+
+			certs = append(certs, subjectName)
+			certs = append(certs, fmt.Sprintf("%d", port))
+			certs = append(certs, expires)
 		}
-
-		certs = append(certs, subjectName)
-		certs = append(certs, fmt.Sprintf("%d", port))
-		certs = append(certs, expires)
-	}
-	// no new certs this round
-	if len(certs) == 0 {
-		return nil, nil
+		// no new certs this round
+		if len(certs) == 0 {
+			return nil
+		}
+		groupReport.Add(am.EventCertExpiring, &ScanGroupReportEvent{Timestamp: time.Now(), Data: certs})
+		//report.GroupReports.Add(groupID, groupReport.Name,
 	}
 
-	return certs, nil
+	return nil
 }
 
 func SendReport(mailer mail.Mailer, report *Report) error {
@@ -208,6 +232,6 @@ func SendReport(mailer mail.Mailer, report *Report) error {
 	if report.ReportType == "weekly" {
 		subject = weeklySubject
 	}
-	log.Info().Str("organization_name", report.OrganizationName).Msg("Sending report")
+	log.Info().Str("organization_name", report.OrganizationName).Int("UserID", report.UserID).Msg("Sending report")
 	return mailer.SendMail(subject, report.Email, buf.String(), buf.String())
 }
