@@ -53,6 +53,9 @@ $BODY$
 BEGIN 
     delete from am.ladon_role_member where organization_id=org_id;
     delete from am.ladon_role where organization_id=org_id;
+    delete from am.custom_web_flow_results where organization_id=org_id;
+    delete from am.custom_web_flow_status where organization_id=org_id;
+    delete from am.custom_web_flows where organization_id=org_id;
     delete from am.scan_group_activity where organization_id=org_id;
     delete from am.scan_group_addresses_overflow where organization_id=org_id;
     delete from am.web_technologies where organization_id=org_id;
@@ -65,9 +68,7 @@ BEGIN
     delete from am.scan_group where organization_id=org_id;
     delete from am.users where organization_id=org_id; 
     delete from am.organizations where organization_id=org_id;
-    delete from am.custom_web_flow_results where organization_id=org_id;
-    delete from am.custom_web_flow_status where organization_id=org_id;
-    delete from am.custom_web_flows where organization_id=org_id;
+   
 END
 $BODY$ LANGUAGE plpgsql SECURITY DEFINER;
 -- +goose StatementEnd
