@@ -131,6 +131,7 @@ revoke references (organization_id) on table am.organizations from customwebflow
 revoke references (user_id) on table am.users from customwebflowservice;
 revoke references (scan_group_id) on table am.scan_group from customwebflowservice;
 revoke usage, select on all sequences in schema am from customwebflowservice;
+revoke all on all sequences in schema am from customwebflowservice;
 revoke usage on schema am from customwebflowservice;
 revoke linkai_user from customwebflowservice;
 
