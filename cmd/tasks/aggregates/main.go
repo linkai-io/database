@@ -38,6 +38,7 @@ func main() {
 	} else {
 		aggregates = []string{"am.do_trihourly_discovered_aggregation", "am.do_trihourly_seen_aggregation", "am.do_trihourly_scanned_aggregation"}
 	}
+
 	for _, agg := range aggregates {
 		var start int
 		var end int
@@ -46,5 +47,14 @@ func main() {
 			log.Fatal().Err(err).Msg("failed to run aggregation functions")
 		}
 		log.Info().Str("aggregation", agg).TimeDiff("completed_in", time.Now(), then).Msg("aggregation completed")
+	}
+
+	// refresh stat views
+	if runType == "day" {
+		then := time.Now()
+		if _, err = pool.Exec("REFRESH MATERIALIZED VIEW CONCURRENTLY am.webdata_server_counts_mv"); err != nil {
+			log.Fatal().Err(err).Msg("failed to run aggregation functions")
+		}
+		log.Info().TimeDiff("completed_in", time.Now(), then).Msg("webdata server matview refresh completed")
 	}
 }
