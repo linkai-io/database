@@ -2,6 +2,7 @@ package mock
 
 import (
 	"context"
+	"time"
 
 	"github.com/linkai-io/am/am"
 )
@@ -25,11 +26,17 @@ type WebDataService struct {
 	GetURLListFn      func(ctx context.Context, userContext am.UserContext, filter *am.WebResponseFilter) (int, []*am.URLListResponse, error)
 	GetURLListInvoked bool
 
+	GetDomainDependencyFn      func(ctx context.Context, userContext am.UserContext, filter *am.WebResponseFilter) (int, *am.WebDomainDependency, error)
+	GetDomainDependencyInvoked bool
+
 	OrgStatsFn      func(ctx context.Context, userContext am.UserContext) (int, []*am.ScanGroupWebDataStats, error)
 	OrgStatsInvoked bool
 
 	GroupStatsFn      func(ctx context.Context, userContext am.UserContext, groupID int) (int, *am.ScanGroupWebDataStats, error)
 	GroupStatsInvoked bool
+
+	ArchiveFn      func(ctx context.Context, userContext am.UserContext, group *am.ScanGroup, archiveTime time.Time) (int, int, error)
+	ArchiveInvoked bool
 }
 
 func (s *WebDataService) Init(config []byte) error {
@@ -61,6 +68,11 @@ func (s *WebDataService) GetURLList(ctx context.Context, userContext am.UserCont
 	return s.GetURLListFn(ctx, userContext, filter)
 }
 
+func (s *WebDataService) GetDomainDependency(ctx context.Context, userContext am.UserContext, filter *am.WebResponseFilter) (int, *am.WebDomainDependency, error) {
+	s.GetDomainDependencyInvoked = true
+	return s.GetDomainDependencyFn(ctx, userContext, filter)
+}
+
 func (c *WebDataService) OrgStats(ctx context.Context, userContext am.UserContext) (int, []*am.ScanGroupWebDataStats, error) {
 	c.OrgStatsInvoked = true
 	return c.OrgStatsFn(ctx, userContext)
@@ -69,4 +81,9 @@ func (c *WebDataService) OrgStats(ctx context.Context, userContext am.UserContex
 func (c *WebDataService) GroupStats(ctx context.Context, userContext am.UserContext, groupID int) (int, *am.ScanGroupWebDataStats, error) {
 	c.GroupStatsInvoked = true
 	return c.GroupStatsFn(ctx, userContext, groupID)
+}
+
+func (c *WebDataService) Archive(ctx context.Context, userContext am.UserContext, group *am.ScanGroup, archiveTime time.Time) (int, int, error) {
+	c.ArchiveInvoked = true
+	return c.Archive(ctx, userContext, group, archiveTime)
 }

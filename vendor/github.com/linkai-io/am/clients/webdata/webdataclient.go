@@ -170,6 +170,32 @@ func (c *Client) GetURLList(ctx context.Context, userContext am.UserContext, fil
 	return int(resp.OrgID), convert.URLListsToDomain(resp.GetURLList()), nil
 }
 
+func (c *Client) GetDomainDependency(ctx context.Context, userContext am.UserContext, filter *am.WebResponseFilter) (int, *am.WebDomainDependency, error) {
+	var resp *service.GetDomainDependencyResponse
+	var err error
+
+	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
+	defer cancel()
+
+	in := &service.GetDomainDependencyRequest{
+		UserContext: convert.DomainToUserContext(userContext),
+		Filter:      convert.DomainToWebResponseFilter(filter),
+	}
+
+	err = retrier.RetryIfNot(func() error {
+		var retryErr error
+
+		resp, retryErr = c.client.GetDomainDependency(ctxDeadline, in)
+
+		return errors.Wrap(retryErr, "unable to get domain deps from client")
+	}, "rpc error: code = Unavailable desc")
+
+	if err != nil {
+		return 0, nil, err
+	}
+	return int(resp.OrgID), convert.WebDomainDependencyToDomain(resp.Dependency), nil
+}
+
 func (c *Client) OrgStats(ctx context.Context, userContext am.UserContext) (oid int, orgStats []*am.ScanGroupWebDataStats, err error) {
 	var resp *service.OrgStatsResponse
 	oid = userContext.GetOrgID()
@@ -216,4 +242,30 @@ func (c *Client) GroupStats(ctx context.Context, userContext am.UserContext, gro
 		return 0, nil, err
 	}
 	return int(resp.GetOrgID()), convert.ScanGroupWebDataStatsToDomain(resp.GetGroupStats()), nil
+}
+
+func (c *Client) Archive(ctx context.Context, userContext am.UserContext, group *am.ScanGroup, archiveTime time.Time) (oid int, count int, err error) {
+	var resp *service.WebArchivedResponse
+	oid = userContext.GetOrgID()
+
+	in := &service.ArchiveWebRequest{
+		UserContext: convert.DomainToUserContext(userContext),
+		ScanGroup:   convert.DomainToScanGroup(group),
+		ArchiveTime: archiveTime.UnixNano(),
+	}
+
+	ctxDeadline, cancel := context.WithTimeout(ctx, c.defaultTimeout)
+	defer cancel()
+
+	err = retrier.RetryIfNot(func() error {
+		var retryErr error
+
+		resp, retryErr = c.client.Archive(ctxDeadline, in)
+		return errors.Wrap(retryErr, "unable to get web archive from client")
+	}, "rpc error: code = Unavailable desc")
+
+	if err != nil {
+		return 0, 0, err
+	}
+	return int(resp.GetOrgID()), int(resp.Count), nil
 }
