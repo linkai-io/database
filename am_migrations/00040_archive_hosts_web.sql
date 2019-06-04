@@ -58,6 +58,9 @@ grant select,insert,update,delete on am.web_responses_archive to webdataservice;
 grant select,insert,update,delete on am.web_technologies_archive to webdataservice;
 grant select,insert,update,delete on am.web_snapshots_archive to webdataservice;
 
+grant select on am.web_techtypes to eventservice;
+grant select on am.scan_group_addresses_ports to eventservice;
+
 -- +goose StatementBegin
 CREATE OR REPLACE FUNCTION am.delete_org(org_id integer) RETURNS void as 
 $BODY$
@@ -131,6 +134,9 @@ BEGIN
 END
 $BODY$ LANGUAGE plpgsql SECURITY DEFINER;
 -- +goose StatementEnd
+
+revoke select on am.web_techtypes from eventservice;
+revoke select on am.scan_group_addresses_ports from eventservice;
 
 revoke select,insert,update,delete on am.scan_group_addresses_ports from addressservice;
 revoke select,insert,update,delete on am.scan_group_addresses_ports_archive from addressservice;
