@@ -103,6 +103,17 @@ $BODY$ LANGUAGE plpgsql SECURITY DEFINER;
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
 
+-- re-insert archive data back into tables as a fail safe
+insert into am.scan_group_addresses_ports (port_id, organization_id, scan_group_id, host_address, ip_address, address_hash, port_data, scanned_timestamp, previous_scanned_timestamp) select port_id, organization_id, scan_group_id, host_address, ip_address, address_hash, port_data, scanned_timestamp, previous_scanned_timestamp from am.scan_group_addresses_ports_archive on conflict do nothing;
+
+insert into am.scan_group_addresses (address_id, organization_id, scan_group_id, host_address, ip_address, discovery_id, confidence_score, user_confidence_score, is_soa, is_wildcard_zone, is_hosted_service, ignored, found_from, ns_record, address_hash, discovered_timestamp, last_scanned_timestamp, last_seen_timestamp, deleted) select address_id, organization_id, scan_group_id, host_address, ip_address, discovery_id, confidence_score, user_confidence_score, is_soa, is_wildcard_zone, is_hosted_service, ignored, found_from, ns_record, address_hash, discovered_timestamp, last_scanned_timestamp, last_seen_timestamp, deleted from am.scan_group_addresses_archive on conflict do nothing;
+
+insert into am.web_responses (response_id, organization_id, scan_group_id, is_document, scheme, ip_address, host_address, response_port, requested_port, url, headers, status, status_text_id, mime_type_id, raw_body_hash, raw_body_link, deleted, response_timestamp, url_request_timestamp, address_hash, load_host_address, load_ip_address) SELECT response_id, organization_id, scan_group_id, is_document, scheme, ip_address, host_address, response_port, requested_port, url, headers, status, status_text_id, mime_type_id, raw_body_hash, raw_body_link, deleted, response_timestamp, url_request_timestamp, address_hash, load_host_address, load_ip_address from am.web_responses_archive on conflict do nothing;
+
+insert into am.web_technologies (tech_id, organization_id, scan_group_id, snapshot_id, techtype_id, matched_text, match_location, version) SELECT tech_id, organization_id, scan_group_id, snapshot_id, techtype_id, matched_text, match_location, version from am.web_technologies_archive on conflict do nothing;
+
+insert into am.web_snapshots (snapshot_id, organization_id, scan_group_id, serialized_dom_hash, serialized_dom_link, snapshot_link, deleted, response_timestamp, url, address_hash, host_address, ip_address, scheme, response_port, requested_port, load_url, url_request_timestamp) select snapshot_id, organization_id, scan_group_id, serialized_dom_hash, serialized_dom_link, snapshot_link, deleted, response_timestamp, url, address_hash, host_address, ip_address, scheme, response_port, requested_port, load_url, url_request_timestamp from am.web_snapshots_archive on conflict do nothing;
+
 -- +goose StatementBegin
 CREATE OR REPLACE FUNCTION am.delete_org(org_id integer) RETURNS void as 
 $BODY$
