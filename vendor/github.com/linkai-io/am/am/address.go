@@ -1,10 +1,43 @@
 package am
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 const (
 	RNAddressAddresses = "lrn:service:address:feature:addresses"
 	AddressServiceKey  = "addressservice"
+)
+
+const (
+	FilterIgnored                = "ignored"
+	FilterWildcard               = "wildcard"
+	FilterHosted                 = "hosted"
+	FilterAfterScannedTime       = "after_scanned_time"
+	FilterBeforeScannedTime      = "before_scanned_time"
+	FilterAfterSeenTime          = "after_seen_time"
+	FilterBeforeSeenTime         = "before_seen_time"
+	FilterAfterDiscoveredTime    = "after_discovered_time"
+	FilterBeforeDiscoveredTime   = "before_discovered_time"
+	FilterAboveConfidence        = "above_confidence"
+	FilterBelowConfidence        = "below_confidence"
+	FilterEqualsConfidence       = "equals_confidence"
+	FilterAboveUserConfidence    = "above_user_confidence"
+	FilterBelowUserConfidence    = "below_user_confidence"
+	FilterEqualsUserConfidence   = "equals_user_confidence"
+	FilterEqualsNSRecord         = "ns_record"
+	FilterNotNSRecord            = "not_ns_record"
+	FilterIPAddress              = "ip_address"
+	FilterNotIPAddress           = "not_ip_address"
+	FilterHostAddress            = "host_address"
+	FilterNotHostAddress         = "not_host_address"
+	FilterEndsHostAddress        = "ends_host_address"
+	FilterNotEndsHostAddress     = "not_ends_host_address"
+	FilterStartsHostAddress      = "starts_host_address"
+	FilterNotStartsHostAddress   = "not_starts_host_address"
+	FilterContainsHostAddress    = "contains_host_address"
+	FilterNotContainsHostAddress = "not_contains_host_address"
 )
 
 /*
@@ -111,4 +144,5 @@ type AddressService interface {
 	Update(ctx context.Context, userContext UserContext, addresses map[string]*ScanGroupAddress) (oid int, count int, err error)
 	Delete(ctx context.Context, userContext UserContext, groupID int, addressIDs []int64) (oid int, err error)
 	Ignore(ctx context.Context, userContext UserContext, groupID int, addressIDs []int64, ignoreValue bool) (oid int, err error)
+	Archive(ctx context.Context, userContext UserContext, group *ScanGroup, archiveTime time.Time) (int, int, error)
 }

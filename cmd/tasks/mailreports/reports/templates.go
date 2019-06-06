@@ -89,7 +89,15 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("</ul>")
 	case am.EventWebHTMLUpdated:
 	case am.EventWebJSChanged:
-	case am.EventWebTechChanged:
+	case am.EventNewWebTech:
+		buf.WriteString("The following new or updated technologies were found:")
+		buf.WriteString("<br>\n<ul>")
+		for _, e := range events {
+			for i := 0; i < len(e.Data); i += 4 {
+				buf.WriteString(fmt.Sprintf("\n\t<li><a href=\"%s\">%s</a> on port %s is running %s %s</li>\n", e.Data[i], e.Data[i], e.Data[i+1], e.Data[i+2], e.Data[i+3]))
+			}
+		}
+		buf.WriteString("</ul>")
 	}
 	return buf.String()
 }

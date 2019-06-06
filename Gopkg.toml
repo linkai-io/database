@@ -31,15 +31,11 @@
 
 [[constraint]]
   name = "github.com/jackc/pgx"
-  version = "3.2.0"
+  version = "3.4.0"
 
 [[constraint]]
   name = "github.com/lib/pq"
   version = "1.0.0"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/linkai-io/am"
 
 [[constraint]]
   name = "github.com/ory/ladon"
@@ -52,3 +48,8 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+   name = "github.com/linkai-io/am"
+   branch = "archive-hosts"
+   source = "github.com/linkai-io/am"

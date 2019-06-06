@@ -35,6 +35,7 @@ import (
 const (
 	tenMinutes    = 600
 	thirtyMinutes = tenMinutes * 3
+	sixtyMinutes  = tenMinutes * 6
 )
 
 // AppConfig represents values taken from environment variables
@@ -130,7 +131,7 @@ func State(appConfig *AppConfig) *redis.State {
 	}
 
 	err = retrier.RetryUntil(func() error {
-		log.Info().Str("addr", addr).Msg("attempting to connect to redis")
+		log.Info().Str("addr", addr).Str("service", appConfig.ServiceKey).Msg("attempting to connect to redis")
 		return redisState.Init(addr, pass)
 	}, time.Minute*1, time.Second*3)
 
@@ -287,7 +288,7 @@ func Module(state *redis.State, moduleType am.ModuleType) am.ModuleService {
 		return nsClient
 	case am.BruteModule:
 		bruteClient := module.New()
-		cfg := &module.Config{ModuleType: am.BruteModule, Timeout: thirtyMinutes}
+		cfg := &module.Config{ModuleType: am.BruteModule, Timeout: sixtyMinutes}
 		data, _ := json.Marshal(cfg)
 
 		err := retrier.RetryUntil(func() error {

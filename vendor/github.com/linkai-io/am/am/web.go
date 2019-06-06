@@ -2,6 +2,7 @@ package am
 
 import (
 	"context"
+	"time"
 )
 
 const (
@@ -10,6 +11,39 @@ const (
 	RNWebDataCertificates = "lrn:service:webdata:feature:certificates"
 	RNWebDataSnapshots    = "lrn:service:webdata:feature:snapshots"
 	WebDataServiceKey     = "webdataservice"
+)
+
+const (
+	FilterDeleted                  = "deleted"
+	FilterWebTechType              = "tech_type"
+	FilterWebTechTypeVersion       = "tech_type_version"
+	FilterWebDependentHostAddress  = "dependent_host_address"
+	FilterWebEqualsHostAddress     = "host_address"
+	FilterWebAfterResponseTime     = "after_response_time"
+	FilterWebBeforeResponseTime    = "before_response_time"
+	FilterWebLatestOnly            = "latest_only"
+	FilterWebMimeType              = "mime_type"
+	FilterWebHeaderNames           = "header_names"
+	FilterWebNotHeaderNames        = "not_header_names"
+	FilterWebHeaderPairNames       = "header_pair_names"
+	FilterWebHeaderPairValues      = "header_pair_values"
+	FilterWebAfterURLRequestTime   = "after_request_time"
+	FilterWebBeforeURLRequestTime  = "before_request_time"
+	FilterWebEqualsURLRequestTime  = "url_request_timestamp"
+	FilterWebEqualsResponseTime    = "response_timestamp"
+	FilterWebEqualsIPAddress       = "ip_address"
+	FilterWebEndsHostAddress       = "ends_host_address"
+	FilterWebStartsHostAddress     = "starts_host_address"
+	FilterWebEqualsLoadIPAddress   = "load_ip_address"
+	FilterWebEqualsLoadHostAddress = "load_host_address"
+	FilterWebEndsLoadHostAddress   = "ends_load_host_address"
+	FilterWebStartsLoadHostAddress = "starts_load_host_address"
+	FilterWebEqualsServerType      = "server_type"
+	FilterWebEqualsURL             = "url"
+	FilterWebAfterValidTo          = "after_valid_to"
+	FilterWebBeforeValidTo         = "before_valid_to"
+	FilterWebAfterValidFrom        = "after_valid_from"
+	FilterWebBeforeValidFrom       = "before_valid_from"
 )
 
 type WebTech struct {
@@ -62,6 +96,25 @@ type URLListResponse struct {
 	HostAddress         string     `json:"host_address,omitempty"` // used for returning data to user
 	IPAddress           string     `json:"ip_address,omitempty"`   // used for returning data to user
 	URLs                []*URLData `json:"urls"`
+}
+
+type WebDomainNode struct {
+	ID     string `json:"id"`
+	Origin int32  `json:"origin"`
+}
+
+type WebDomainLink struct {
+	Source string `json:"source"`
+	Target string `json:"target"`
+}
+
+type WebDomainDependency struct {
+	Status    string           `json:"status,omitempty"`
+	OrgID     int              `json:"organization_id,omitempty"`
+	GroupID   int              `json:"group_id,omitempty"`
+	LastIndex int64            `json:"last_index"`
+	Nodes     []*WebDomainNode `json:"nodes"`
+	Links     []*WebDomainLink `json:"links"`
 }
 
 // HTTPResponse represents a captured network response
@@ -194,4 +247,6 @@ type WebDataService interface {
 	GetResponses(ctx context.Context, userContext UserContext, filter *WebResponseFilter) (int, []*HTTPResponse, error)
 	GetCertificates(ctx context.Context, userContext UserContext, filter *WebCertificateFilter) (int, []*WebCertificate, error)
 	GetSnapshots(ctx context.Context, userContext UserContext, filter *WebSnapshotFilter) (int, []*WebSnapshot, error)
+	GetDomainDependency(ctx context.Context, userContext UserContext, filter *WebResponseFilter) (int, *WebDomainDependency, error)
+	Archive(ctx context.Context, userContext UserContext, group *ScanGroup, archiveTime time.Time) (int, int, error)
 }
