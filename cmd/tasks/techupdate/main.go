@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/linkai-io/am/pkg/filestorage"
-
 	"github.com/linkai-io/am/pkg/initializers"
 	"github.com/linkai-io/am/pkg/webtech"
 	"github.com/rs/zerolog"
@@ -43,7 +42,6 @@ func main() {
 	}
 
 	appJSON := downloadLatestWappalyzer()
-
 	storage := filestorage.NewS3Storage(appConfig.Env, appConfig.Region)
 	if err := storage.Init(); err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize s3 storage")
