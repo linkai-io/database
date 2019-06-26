@@ -17,7 +17,7 @@ create table am.scan_group_addresses_ports (
 	scanned_timestamp timestamptz not null default 'epoch',
 	previous_scanned_timestamp timestamptz not null default 'epoch',
 	check (host_address is not null),
-    UNIQUE(scan_group_id, host_address)
+    UNIQUE(organization_id, scan_group_id, host_address)
 );
 
 create table am.scan_group_addresses_ports_archive (
@@ -25,14 +25,11 @@ create table am.scan_group_addresses_ports_archive (
 	archived_timestamp timestamptz not null default 'epoch' 
 );
 
+grant select,insert,update,delete on am.scan_group_addresses_ports to addressservice;
+grant select,insert,update,delete on am.scan_group_addresses_ports_archive to addressservice;
+
 create index scan_group_addresses_ports_scanned_timestamp_idx on am.scan_group_addresses_ports (organization_id, scan_group_id, scanned_timestamp);
 create index scan_group_addresses_ports_host_address_idx on am.scan_group_addresses_ports (organization_id, scan_group_id, host_address);
-
-alter table only am.scan_group_addresses_archive add column port_scan_override_tld boolean default false;
-alter table only am.scan_group_addresses_archive add column port_scan_enabled boolean default false;
-
-alter table only am.scan_group_addresses add column port_scan_override_tld boolean default false;
-alter table only am.scan_group_addresses add column port_scan_enabled boolean default false;
 
 alter table only am.organizations add column port_scan_feature_enabled boolean default false;
 
@@ -40,11 +37,8 @@ alter table only am.organizations add column port_scan_feature_enabled boolean d
 -- SQL in this section is executed when the migration is rolled back.
 alter table only am.organizations drop column port_scan_feature_enabled;
 
-alter table only am.scan_group_addresses drop column port_scan_override_tld;
-alter table only am.scan_group_addresses drop column port_scan_enabled;
-
-alter table only am.scan_group_addresses_archive drop port_scan_override_tld;
-alter table only am.scan_group_addresses_archive drop column port_scan_enabled;
+revoke select,insert,update,delete on am.scan_group_addresses_ports from addressservice;
+revoke select,insert,update,delete on am.scan_group_addresses_ports_archive from addressservice;
 
 drop index am.scan_group_addresses_ports_host_address_idx;
 drop index am.scan_group_addresses_ports_scanned_timestamp_idx;
