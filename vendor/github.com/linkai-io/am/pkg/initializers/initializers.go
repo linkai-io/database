@@ -197,6 +197,20 @@ func AddrClient() am.AddressService {
 	return addrClient
 }
 
+// AddrClientWithTimeout connects to the address service with specified timeout for all calls
+func AddrClientWithTimeout(timeout time.Duration) am.AddressService {
+	addrClient := address.New()
+	addrClient.SetTimeout(timeout)
+	err := retrier.RetryUntil(func() error {
+		return addrClient.Init(nil)
+	}, time.Minute*1, time.Second*3)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("error connecting to address server")
+	}
+	return addrClient
+}
+
 // EventClient connects to the address service
 func EventClient() am.EventService {
 	eventClient := event.New()
@@ -228,6 +242,21 @@ func CoordClient() am.CoordinatorService {
 // WebDataClient connects to the webdata service
 func WebDataClient() am.WebDataService {
 	webDataClient := webdata.New()
+
+	err := retrier.RetryUntil(func() error {
+		return webDataClient.Init(nil)
+	}, time.Minute*1, time.Second*3)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("error connecting to webdata server")
+	}
+	return webDataClient
+}
+
+// WebDataClient connects to the webdata service with specified timeout for all calls
+func WebDataClientWithTimeout(timeout time.Duration) am.WebDataService {
+	webDataClient := webdata.New()
+	webDataClient.SetTimeout(timeout)
 
 	err := retrier.RetryUntil(func() error {
 		return webDataClient.Init(nil)
@@ -326,6 +355,28 @@ func Module(state *redis.State, moduleType am.ModuleType) am.ModuleService {
 		return bdClient
 	}
 	return nil
+}
+
+// PortScanModule connects directly with our port scanner service
+func PortScanModule(server, token string) am.PortScannerService {
+	portScan := module.NewPortScanClient()
+
+	cfg := &module.PortScanConfig{ModuleType: am.PortScanModule, Timeout: thirtyMinutes, ServerAddress: server, Token: token}
+	data, _ := json.Marshal(cfg)
+
+	err := retrier.RetryUntil(func() error {
+		log.Info().Msg("connecting to port scan module...")
+		e := portScan.Init(data)
+		if e != nil {
+			log.Error().Err(e).Msg("failed")
+		}
+		return portScan.Init(data)
+	}, time.Minute*1, time.Second*3)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("unable to connect to portScan module client")
+	}
+	return portScan
 }
 
 // Modules initializes all modules and connects to them
