@@ -28,6 +28,8 @@ create table am.scan_group_addresses_ports_archive (
 grant select,insert,update,delete on am.scan_group_addresses_ports to addressservice;
 grant select,insert,update,delete on am.scan_group_addresses_ports_archive to addressservice;
 
+grant select on am.scan_group_addresses_ports to eventservice;
+
 create index scan_group_addresses_ports_scanned_timestamp_idx on am.scan_group_addresses_ports (organization_id, scan_group_id, scanned_timestamp);
 create index scan_group_addresses_ports_host_address_idx on am.scan_group_addresses_ports (organization_id, scan_group_id, host_address);
 
@@ -37,6 +39,7 @@ alter table only am.organizations add column port_scan_feature_enabled boolean d
 -- SQL in this section is executed when the migration is rolled back.
 alter table only am.organizations drop column port_scan_feature_enabled;
 
+revoke select on am.scan_group_addresses_ports from eventservice;
 revoke select,insert,update,delete on am.scan_group_addresses_ports from addressservice;
 revoke select,insert,update,delete on am.scan_group_addresses_ports_archive from addressservice;
 
