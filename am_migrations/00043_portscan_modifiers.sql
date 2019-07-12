@@ -16,8 +16,9 @@ create table am.scan_group_addresses_ports (
 	port_data jsonb not null default '{}'::jsonb,
 	scanned_timestamp timestamptz not null default 'epoch',
 	previous_scanned_timestamp timestamptz not null default 'epoch',
+	is_ipv4 boolean default true,
 	check (host_address is not null),
-    UNIQUE(organization_id, scan_group_id, host_address)
+    UNIQUE(organization_id, scan_group_id, host_address, is_ipv4)
 );
 
 create table am.scan_group_addresses_ports_archive (
