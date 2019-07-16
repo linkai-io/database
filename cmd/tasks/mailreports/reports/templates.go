@@ -49,6 +49,38 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 			buf.WriteString(event)
 		}
 		buf.WriteString("</ul>")
+	case am.EventNewOpenPort:
+		buf.WriteString("The following ports were opened:")
+		buf.WriteString("<br>\n<ul>")
+		for _, e := range events {
+			if len(e.Data)%4 != 0 {
+				continue
+			}
+			for i := 0; i < len(e.Data); i += 4 {
+				ips := e.Data[i+1] + ") previously (" + e.Data[i+2]
+				if e.Data[i+1] == e.Data[i+2] {
+					ips = e.Data[i+1]
+				}
+				buf.WriteString(fmt.Sprintf("\n\t<li>Host %s (%s) ports: %s</li>\n", e.Data[i], ips, e.Data[i+3]))
+			}
+		}
+		buf.WriteString("</ul>")
+	case am.EventClosedPort:
+		buf.WriteString("The following ports were recently closed:")
+		buf.WriteString("<br>\n<ul>")
+		for _, e := range events {
+			if len(e.Data)%4 != 0 {
+				continue
+			}
+			for i := 0; i < len(e.Data); i += 4 {
+				ips := e.Data[i+1] + ") previously (" + e.Data[i+2]
+				if e.Data[i+1] == e.Data[i+2] {
+					ips = e.Data[i+1]
+				}
+				buf.WriteString(fmt.Sprintf("\n\t<li>Host %s (%s) ports: %s</li>\n", e.Data[i], ips, e.Data[i+3]))
+			}
+		}
+		buf.WriteString("</ul>")
 	case am.EventInitialGroupComplete:
 	case am.EventMaxHostPricing:
 	case am.EventNewHost:
