@@ -51,7 +51,7 @@
   version = "v1.11.1"
 
 [[projects]]
-  digest = "1:fac31cbd2ee8c63044873c91380f27f6f7ead9109881c3aae83d79953f853188"
+  digest = "1:839ff2c0a1069b63cf8dd79abdcebf5a16e041e529a03e64f5267cdc9fb890a0"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -94,8 +94,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "29db91562071cdb55ce57e0c3fb3f2abf184749b"
-  version = "v1.20.19"
+  revision = "420cda5d6383f94f7d9c231aa44bad3325181950"
+  version = "v1.20.20"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -272,8 +272,8 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "port-scan"
-  digest = "1:c1f82a8b54d3d5d43f43662bb2f700a9c571b51c0e7b3b2ac95d95b9663ebe9a"
+  branch = "master"
+  digest = "1:c2dd8df2166d1c39c6f8b1ef08f70eecf3d57b09fbe340df42b69d0656cd1017"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -316,7 +316,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "a2006a6f7d118cb1b5eb971bdfb0cb03b208905a"
+  revision = "3a056ba10ceb90286ed128068a34e0bbf61ae9cd"
   source = "github.com/linkai-io/am"
 
 [[projects]]
@@ -499,14 +499,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:47a52ed81842d647114b9210719bb6d8e1595094a6cb23e70123bb1f109f3c80"
+  digest = "1:31d44814b45607afa77c6e8ef20ea8bacc1d1053fe084440c874f311732e7ec3"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "6ec70d6a5542cba804c6d16ebe8392601a0b7b60"
+  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
 
 [[projects]]
   digest = "1:5f1559c4cee44069f81517430ebba19589869f3d4d4648213a4d5ddd199b11d8"
