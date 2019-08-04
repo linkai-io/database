@@ -7,6 +7,7 @@ import "time"
 type ScanGroupReportEvent struct {
 	Timestamp time.Time
 	Data      []string
+	JSONData  string
 }
 
 // ScanGroupData holds the group name and a map of a slice

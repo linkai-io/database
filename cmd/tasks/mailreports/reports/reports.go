@@ -2,6 +2,7 @@ package reports
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"text/template"
@@ -149,9 +150,10 @@ func GetReportEvents(mailer mail.Mailer, pool *pgx.ConnPool, rows *pgx.Rows, rep
 		var sgName string
 		var typeID int32
 		var data []string
+		var jsonData string
 		var ts time.Time
 
-		if err := rows.Scan(&orgID, &groupID, &sgName, &userID, &typeID, &ts, &data); err != nil {
+		if err := rows.Scan(&orgID, &groupID, &sgName, &userID, &typeID, &ts, &data, &jsonData); err != nil {
 			log.Warn().Err(err).Msg("failed to read event data")
 			continue
 		}
@@ -167,10 +169,10 @@ func GetReportEvents(mailer mail.Mailer, pool *pgx.ConnPool, rows *pgx.Rows, rep
 		}
 
 		// for certificates, there's the chance it already expired, so skip this and we'll check all after
-		if typeID == am.EventCertExpiring {
+		if typeID == am.EventCertExpiringID {
 			continue
 		}
-		report.GroupReports.Add(groupID, sgName, typeID, &ScanGroupReportEvent{Timestamp: ts, Data: data})
+		report.GroupReports.Add(groupID, sgName, typeID, &ScanGroupReportEvent{Timestamp: ts, Data: data, JSONData: jsonData})
 	}
 
 	if err := CheckCertificates(pool, report); err != nil {
@@ -190,7 +192,7 @@ func CheckCertificates(pool *pgx.ConnPool, report *Report) error {
 		if err != nil {
 			return err
 		}
-		certs := make([]string, 0)
+		certs := make([]*am.EventCertExpiring, 0)
 		for i := 0; rows.Next(); i++ {
 			var subjectName string
 			var port int
@@ -207,17 +209,22 @@ func CheckCertificates(pool *pgx.ConnPool, report *Report) error {
 			} else {
 				expires = fmt.Sprintf("%.0f days", ts/float64(24))
 			}
-
-			certs = append(certs, subjectName)
-			certs = append(certs, fmt.Sprintf("%d", port))
-			certs = append(certs, expires)
+			certs = append(certs, &am.EventCertExpiring{
+				SubjectName:   subjectName,
+				Port:          port,
+				ValidTo:       validTo,
+				TimeRemaining: expires,
+			})
 		}
 		// no new certs this round
 		if len(certs) == 0 {
 			return nil
 		}
-		groupReport.Add(am.EventCertExpiring, &ScanGroupReportEvent{Timestamp: time.Now(), Data: certs})
-		//report.GroupReports.Add(groupID, groupReport.Name,
+		m, err := json.Marshal(certs)
+		if err != nil {
+			return err
+		}
+		groupReport.Add(am.EventCertExpiringID, &ScanGroupReportEvent{Timestamp: time.Now(), JSONData: string(m), Data: nil})
 	}
 
 	return nil
