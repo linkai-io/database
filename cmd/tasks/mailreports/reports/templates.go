@@ -250,7 +250,6 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 					buf.WriteString(fmt.Sprintf("\n\t<li><a href=\"%s\">%s</a> on port %s is running %s %s</li>\n", e.Data[i], e.Data[i], e.Data[i+1], e.Data[i+2], e.Data[i+3]))
 				}
 			}
-
 		}
 		buf.WriteString("</ul>")
 	}
