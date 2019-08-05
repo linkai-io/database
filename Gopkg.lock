@@ -274,7 +274,7 @@
 
 [[projects]]
   branch = "fix-redirect-events"
-  digest = "1:b8459e6130c67e7d25df2164443b70290f98ff96720377bc069605fad6013656"
+  digest = "1:9067bc0ffe1a96be630b7bc9571b33ec2c41018aba71acc94ac67459dad6035e"
   name = "github.com/linkai-io/am"
   packages = [
     "am",
@@ -317,7 +317,7 @@
     "protocservices/webdata",
   ]
   pruneopts = "UT"
-  revision = "9a5def95629eb920a6fc0ae8f180726f4252ba9f"
+  revision = "4b590643f90023d8ee3391126f3b2c7c2496b167"
   source = "github.com/linkai-io/am"
 
 [[projects]]
@@ -500,14 +500,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:16c3c95c0f98e5bff7c863065da66f1e747bced6f101281c041060830842ebc1"
+  digest = "1:00d73f8175ba939718fdfc3d3ecab52270c6d801a1930fbca62100f9a4d8f4c1"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "cbf593c0f2f39034e9104bbf77e2ec7c48c98fc5"
+  revision = "51ab0e2deafac1f46c46ad59cf0921be2f180c3d"
 
 [[projects]]
   digest = "1:5f1559c4cee44069f81517430ebba19589869f3d4d4648213a4d5ddd199b11d8"

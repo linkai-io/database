@@ -51,5 +51,5 @@
 
 [[constraint]]
    name = "github.com/linkai-io/am"
-   branch = "fix-redirect-events"
+   branch = "master"
    source = "github.com/linkai-io/am"
