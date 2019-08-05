@@ -1,5 +1,6 @@
 SERVICES = am_migrations pg_migrations db_systemids
 APP_ENV = prod
+
 mailreports:
 	docker build -t db_mailreports -f Dockerfile.db_mailreports .
 

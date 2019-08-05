@@ -21,7 +21,8 @@ func buildGetReportQuery(orgID, userID int, since time.Time) (string, []interfac
 		"subs.user_id",
 		"subs.type_id",
 		"events.event_timestamp",
-		"events.event_data").FromSelect(sub, "subs").
+		"events.event_data",
+		"events.event_data_json").FromSelect(sub, "subs").
 		Join("am.event_notifications as events on subs.type_id=events.type_id and events.organization_id=subs.organization_id").
 		Join("am.scan_group as sg on events.scan_group_id=sg.scan_group_id and events.organization_id=sg.organization_id").
 		Where(sq.Eq{"sg.deleted": false}).
