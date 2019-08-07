@@ -46,7 +46,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("The following certificates will expire soon:")
 		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				// handle new json type
 				var expireCerts []*am.EventCertExpiring
 				if err := json.Unmarshal([]byte(e.JSONData), &expireCerts); err != nil {
@@ -69,7 +69,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
 			// handle new json type
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 
 				var openPorts []*am.EventNewOpenPort
 				if err := json.Unmarshal([]byte(e.JSONData), &openPorts); err != nil {
@@ -104,7 +104,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("<br>\n<ul>")
 
 		for _, e := range events {
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				var closedPorts []*am.EventClosedPort
 				if err := json.Unmarshal([]byte(e.JSONData), &closedPorts); err != nil {
 					continue
@@ -140,7 +140,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("\n<ul>")
 		for _, e := range events {
 
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				var newHosts []*am.EventNewHost
 				if err := json.Unmarshal([]byte(e.JSONData), &newHosts); err != nil {
 					continue
@@ -163,7 +163,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("The following name servers were found leaking hostnames via Zone Transfer")
 		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				var axfrServers []*am.EventAXFR
 				if err := json.Unmarshal([]byte(e.JSONData), &axfrServers); err != nil {
 					continue
@@ -183,7 +183,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("The following name servers are leaking hostnames via NSEC records")
 		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				var nsecServers []*am.EventNSEC
 				if err := json.Unmarshal([]byte(e.JSONData), &nsecServers); err != nil {
 					continue
@@ -204,7 +204,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("The following new web sites were found:")
 		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				var newSites []*am.EventNewWebsite
 				if err := json.Unmarshal([]byte(e.JSONData), &newSites); err != nil {
 					continue
@@ -231,7 +231,7 @@ func EventPrinter(typeID int32, events []*ScanGroupReportEvent) string {
 		buf.WriteString("The following new or updated technologies were found:")
 		buf.WriteString("<br>\n<ul>")
 		for _, e := range events {
-			if e.JSONData != "" {
+			if e.JSONData != "" && e.JSONData != "{}" {
 				var newTech []*am.EventNewWebTech
 				if err := json.Unmarshal([]byte(e.JSONData), &newTech); err != nil {
 					continue
